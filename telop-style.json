@@ -1,0 +1,10 @@
+{
+  "fontSize": 75,
+  "color": "#ffffff",
+  "fontFamily": "Yu Gothic",
+  "fontWeight": "bold",
+  "background": "dark",
+  "position": "bottom",
+  "shadow": true,
+  "maxCharsPerLine": 22
+}

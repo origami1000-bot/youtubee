@@ -1,0 +1,10 @@
+node_modules/
+out/
+.env
+.env.*
+!.env.example
+.remotion/
+*.log
+.DS_Store
+Thumbs.db
+public/drop/

@@ -1,0 +1,30 @@
+{
+  "name": "youtube_video_creation",
+  "version": "1.0.0",
+  "description": "My Remotion Video",
+  "scripts": {
+    "start": "remotion studio",
+    "build": "remotion render",
+    "sync-assets": "node scripts/sync-assets-from-drop.js",
+    "app": "node scripts/local-app.js",
+    "reset-project": "node scripts/reset-project.js"
+  },
+  "dependencies": {
+    "@remotion/media-utils": "^4.0.440",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "kuromoji": "^0.1.2",
+    "multer": "^2.1.1",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "remotion": "^4.0.0"
+  },
+  "devDependencies": {
+    "@remotion/cli": "^4.0.0",
+    "@remotion/eslint-config": "^4.0.0",
+    "@types/react": "^18.0.26",
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0"
+  }
+}

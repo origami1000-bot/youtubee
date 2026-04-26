@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>動画プロジェクト</title>
+  <link rel="stylesheet" href="/static/app.css" />
+</head>
+<body>
+  <div class="layout">
+    <header class="header">
+      <h1>動画プロジェクト</h1>
+      <p class="subtitle">台本・画像を用意するだけで動画が完成します</p>
+      <p id="serverStaleBanner" class="server-stale-banner" hidden></p>
+    </header>
+
+    <main class="grid">
+
+      <!-- ① 台本 -->
+      <section class="card">
+        <h2>① 台本（video-config.json）</h2>
+        <p class="hint">Gemini などで出した JSON を貼り付けて保存。各シーンに <code>text</code>・<code>effect</code>・<code>durationInSeconds</code> を含めてください。</p>
+        <textarea id="script" rows="16" spellcheck="false" placeholder='[ { "text": "テキスト", "effect": "zoom-in", "durationInSeconds": 10 } ]'></textarea>
+        <div class="btn-row">
+          <button type="button" class="btn primary" id="saveScript">保存</button>
+          <span id="scriptStatus" class="status" aria-live="polite"></span>
+        </div>
+      </section>
+
+      <!-- ② 画像 -->
+      <section class="card">
+        <h2>② 画像アップロード</h2>
+        <p class="hint">ファイル名の先頭に <code>01_</code> <code>02_</code> … を付けると順番が固定されます。アップロード後「マニフェスト更新」を押してください。</p>
+        <label class="btn secondary upload-btn">画像を追加（複数可）
+          <input type="file" id="imgFiles" accept="image/*" multiple hidden />
+        </label>
+        <div class="paths">
+          直接コピーしても OK → <code>public/drop/images/</code>
+        </div>
+        <div class="btn-row" style="margin-top:12px">
+          <button type="button" class="btn" id="syncAssets">マニフェスト更新</button>
+          <button type="button" class="btn secondary" id="openImagesFolder">📂 画像フォルダを開く</button>
+        </div>
+        <p id="uploadStatus" class="status" style="display:block;margin-top:6px"></p>
+      </section>
+
+      <!-- ③-1 音声自動生成 -->
+      <section class="card wide">
+        <h2>③-① 音声自動生成</h2>
+        <p class="hint">TTS プロバイダーを選択して API キーを入力し、音声を生成してください。</p>
+
+        <!-- プロバイダー切替 -->
+        <div class="provider-tabs">
+          <button type="button" class="provider-tab active" data-provider="openai">OpenAI TTS</button>
+          <button type="button" class="provider-tab" data-provider="aivis">Aivis Cloud</button>
+          <button type="button" class="provider-tab" data-provider="gemini">Google Gemini TTS</button>
+          <button type="button" class="provider-tab" data-provider="xai">Grok（xAI）TTS</button>
+        </div>
+
+        <!-- OpenAI フォーム -->
+        <div id="openaiForm" class="el-grid" style="margin-top:14px">
+          <div class="el-field">
+            <label>OpenAI API キー</label>
+            <input type="password" id="openaiApiKey" placeholder="sk-..." autocomplete="off" />
+          </div>
+          <div class="el-field">
+            <label>ボイス</label>
+            <select id="openaiVoice">
+              <option value="nova">nova（自然な女性）</option>
+              <option value="shimmer">shimmer（柔らかい女性）</option>
+              <option value="alloy">alloy（中性的）</option>
+              <option value="echo">echo（落ち着いた男性）</option>
+              <option value="fable">fable（表現豊かな男性）</option>
+              <option value="onyx">onyx（低音の男性）</option>
+            </select>
+          </div>
+          <div class="el-field">
+            <label>モデル</label>
+            <select id="openaiModel">
+              <option value="tts-1">tts-1（高速・低コスト）</option>
+              <option value="tts-1-hd">tts-1-hd（高品質）</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Aivis Cloud フォーム -->
+        <div id="aivisForm" class="el-grid" style="margin-top:14px; display:none">
+          <div class="el-field">
+            <label>Aivis Cloud API キー <span style="font-size:0.8em;color:#64748b">（<a href="https://hub.aivis-project.com/cloud-api/dashboard" target="_blank">ダッシュボード</a>で取得）</span></label>
+            <input type="password" id="aivisApiKey" placeholder="aivis-..." autocomplete="off" />
+          </div>
+          <div class="el-field">
+            <label>モデル UUID <span style="font-size:0.8em;color:#64748b">（<a href="https://hub.aivis-project.com/search?sort=download" target="_blank">AivisHub</a> でモデルを選んで UUID をコピー）</span></label>
+            <input type="text" id="aivisModelUuid" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" />
+          </div>
+        </div>
+
+        <!-- Gemini フォーム -->
+        <div id="geminiForm" class="el-grid" style="margin-top:14px; display:none">
+          <div class="el-field">
+            <label>Gemini API キー <span style="font-size:0.8em;color:#64748b">（.env の GOOGLE_AI_STUDIO_API_KEY を自動入力）</span></label>
+            <input type="password" id="geminiApiKey" placeholder="AIza..." autocomplete="off" />
+          </div>
+          <div class="el-field">
+            <label>モデル</label>
+            <select id="geminiModel">
+              <option value="gemini-2.5-flash-preview-tts">Flash（安定・高速 ★推奨）</option>
+              <option value="gemini-2.5-pro-preview-tts">Pro（高品質・不安定）</option>
+            </select>
+          </div>
+          <div class="el-field">
+            <label>ボイス名</label>
+            <select id="geminiVoice">
+              <option value="Kore">Kore（落ち着いた女性）</option>
+              <option value="Aoede">Aoede（明るい女性）</option>
+              <option value="Charon">Charon（落ち着いた男性）</option>
+              <option value="Fenrir">Fenrir（力強い男性）</option>
+              <option value="Puck">Puck（若い男性）</option>
+              <option value="Orbit">Orbit（中性的）</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- xAI Grok TTS -->
+        <div id="xaiForm" class="el-grid" style="margin-top:14px; display:none">
+          <div class="el-field">
+            <label>xAI API キー <span style="font-size:0.8em;color:#64748b">（<a href="https://console.x.ai/team/default/api-keys" target="_blank" rel="noopener">console.x.ai</a> の API Keys。環境変数 <code>XAI_API_KEY</code> または <code>GROK_API_KEY</code> でも可）</span></label>
+            <input type="password" id="xaiApiKey" placeholder="xai-..." autocomplete="off" />
+          </div>
+          <div class="el-field">
+            <label>ボイス（voice_id）</label>
+            <select id="xaiVoice">
+              <option value="eve">eve（明るい女性・既定）</option>
+              <option value="ara">ara（温かい女性）</option>
+              <option value="rex">rex（ビジネス向き男性）</option>
+              <option value="sal">sal（中性的・バランス）</option>
+              <option value="leo">leo（権威ある男性・解説向き）</option>
+            </select>
+          </div>
+          <div class="el-field">
+            <label>言語（BCP-47）</label>
+            <select id="xaiLanguage">
+              <option value="ja">ja（日本語）</option>
+              <option value="auto">auto（自動判定）</option>
+              <option value="en">en（英語）</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="el-field" style="margin-top:14px">
+          <label>ナレーター指示（システムプロンプト）<span style="font-size:0.8em;color:#64748b"> — Gemini のみ有効・空欄でも動作します</span></label>
+          <textarea id="geminiInstruction" rows="3" spellcheck="false" placeholder="例: あなたはプロの日本語YouTubeナレーターです。毎回同じ声・同じキャラクターで、内容に合った自然な感情表現で読み上げてください。"></textarea>
+        </div>
+
+        <div class="el-field" style="margin-top:14px">
+          <label>話す速度 <span style="font-size:0.8em;color:#64748b">（生成後に FFmpeg atempo で反映。Remotion 同梱の ffmpeg を自動利用／なければ PATH または FFMPEG_PATH）</span>
+            <span id="ttsSpeedLabel" style="font-weight:bold;margin-left:8px">0.9x</span>
+          </label>
+          <input type="range" id="ttsSpeed" min="0.5" max="1.5" step="0.05" value="0.9"
+            style="width:100%;accent-color:#6366f1" />
+          <div style="display:flex;justify-content:space-between;font-size:0.75em;color:#94a3b8">
+            <span>0.5x（ゆっくり）</span><span>1.0x（普通）</span><span>1.5x（速い）</span>
+          </div>
+        </div>
+
+        <div class="btn-row" style="margin-top:14px">
+          <button type="button" class="btn primary" id="generateAudio">全シーン音声生成</button>
+          <span id="audioStatus" class="status" style="display:block;margin-top:6px;white-space:pre-wrap" aria-live="polite"></span>
+        </div>
+        <p id="audioLog" class="export-log" style="display:none"></p>
+      </section>
+
+      <!-- ③-2 読み上げ修正パネル -->
+      <section class="card wide">
+        <h2>③-② 読み上げ修正</h2>
+        <p class="hint">テロップ（表示の <code>text</code>）はそのままで、読み上げだけ変えられます。<strong>読み上げ欄が空欄のシーンは、台本 JSON の <code>speech_text</code> と同じ内容が読まれます</strong>（テロップと同じではありません）。</p>
+        <div id="ttsPanel">
+          <p class="muted-text">台本を保存すると自動で一覧が表示されます。</p>
+        </div>
+        <div class="btn-row" style="margin-top:12px">
+          <button type="button" class="btn primary" id="saveTtsText">読み上げテキストを保存</button>
+          <span id="ttsStatus" class="status" aria-live="polite"></span>
+        </div>
+      </section>
+
+      <!-- ③-3 読み上げ辞書（全シーン一括置換） -->
+      <section class="card wide">
+        <h2>③-③ 読み上げ辞書（全体置換ルール）</h2>
+        <p class="hint">よく間違えられる単語や漢字を一括で修正します。保存すると、全シーンの読み上げ用テキストに自動適用されます。</p>
+        <div id="dictPanel">
+          <table class="tts-table" id="dictTable">
+            <thead>
+              <tr>
+                <th>置換前（間違える単語）</th>
+                <th>置換後（正しいひらがな）</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="dictBody">
+              <!-- JSで動的に追加 -->
+            </tbody>
+          </table>
+          <button type="button" class="btn secondary" id="addDictRow" style="margin-top:12px; font-size: 0.85rem;">+ ルールを追加</button>
+        </div>
+        <div class="btn-row" style="margin-top:16px">
+          <button type="button" class="btn primary" id="saveDict">辞書を保存して台本に適用</button>
+          <span id="dictStatus" class="status" aria-live="polite"></span>
+        </div>
+      </section>
+
+      <!-- ④ テロップスタイル -->
+      <section class="card wide">
+        <h2>④ テロップスタイル</h2>
+        <p class="hint">動画に重なるテロップの見た目を設定します。保存するとすぐプレビューに反映されます。</p>
+        <div class="style-grid">
+          <div class="style-field">
+            <label>文字サイズ（px）</label>
+            <input type="number" id="stFontSize" min="30" max="150" value="75" />
+          </div>
+          <div class="style-field">
+            <label>文字色</label>
+            <input type="color" id="stColor" value="#ffffff" />
+          </div>
+          <div class="style-field">
+            <label>フォント</label>
+            <select id="stFont">
+              <option value="Meiryo">Meiryo（メイリオ）</option>
+              <option value="Yu Gothic">游ゴシック</option>
+              <option value="Hiragino Kaku Gothic ProN">ヒラギノ角ゴ</option>
+              <option value="MS PGothic">MS Pゴシック</option>
+            </select>
+          </div>
+          <div class="style-field">
+            <label>太さ</label>
+            <select id="stWeight">
+              <option value="bold">太字</option>
+              <option value="normal">普通</option>
+            </select>
+          </div>
+          <div class="style-field">
+            <label>背景帯</label>
+            <select id="stBg">
+              <option value="none">なし（透明）</option>
+              <option value="dark">半透明黒</option>
+              <option value="light">半透明白</option>
+            </select>
+          </div>
+          <div class="style-field">
+            <label>表示位置</label>
+            <select id="stPosition">
+              <option value="bottom">下部</option>
+              <option value="center">中央</option>
+              <option value="top">上部</option>
+            </select>
+          </div>
+          <div class="style-field">
+            <label>ドロップシャドウ</label>
+            <select id="stShadow">
+              <option value="true">あり</option>
+              <option value="false">なし</option>
+            </select>
+          </div>
+          <div class="style-field">
+            <label>1行の最大文字数</label>
+            <input type="number" id="stMaxChars" min="10" max="40" value="22" />
+          </div>
+        </div>
+        <div class="btn-row" style="margin-top:12px">
+          <button type="button" class="btn primary" id="saveStyle">スタイルを保存</button>
+          <span id="styleStatus" class="status" aria-live="polite"></span>
+        </div>
+      </section>
+
+      <!-- ⑤ エクスポート -->
+      <section class="card wide">
+        <h2>⑤ エクスポート</h2>
+        <p class="hint">音声生成・画像アップ・マニフェスト更新が済んだらエクスポートできます。レンダーには数分〜数十分かかります。<strong>進捗ログは <code>npm run app</code> を実行しているターミナル（PowerShell など）に表示されます。</strong>ブラウザは完了まで待機表示のままになります。</p>
+        <div class="btn-row">
+          <button type="button" class="btn primary" id="exMp4">MP4（完成版）</button>
+          <button type="button" class="btn" id="exSrt">字幕 SRT のみ</button>
+          <button type="button" class="btn" id="exSplit">映像のみ MP4 + ミックス音声 WAV</button>
+          <button type="button" class="btn accent" id="exBundle">バラバラ一括（SRT + MP4 + WAV）</button>
+        </div>
+        <p id="exportStatus" class="export-log" aria-live="polite"></p>
+      </section>
+
+      <!-- ⑥ テロップ直接編集 -->
+      <section class="card wide">
+        <div class="telop-edit-header">
+          <div>
+            <h2>⑥ テロップ直接編集</h2>
+            <p class="hint" style="margin:0">テキストを変更すると自動保存され、プレビューにリアルタイム反映されます。</p>
+          </div>
+          <span id="telopSaveAllStatus" class="status"></span>
+        </div>
+        <div id="telopPanel">
+          <p class="muted-text">台本を保存すると自動で一覧が表示されます。</p>
+        </div>
+      </section>
+
+      <!-- ⑦ プレビュー -->
+      <section class="card wide preview-card">
+        <div class="preview-header">
+          <h2>⑦ プレビュー（Remotion Studio）</h2>
+          <div class="btn-row">
+            <button type="button" class="btn primary" id="startPreview">起動</button>
+            <button type="button" class="btn" id="stopPreview">停止</button>
+            <span id="previewStatus" class="status"></span>
+          </div>
+        </div>
+        <div class="iframe-wrap" id="iframeWrap">
+          <div class="iframe-placeholder" id="iframePlaceholder">「起動」を押すと Remotion Studio がここに表示されます</div>
+          <iframe id="previewFrame" src="" allow="autoplay" style="display:none;width:100%;height:100%;border:none;border-radius:8px;"></iframe>
+        </div>
+      </section>
+
+      <!-- ⑧ 新しい動画（前作データ全消去） -->
+      <section class="card wide reset-card">
+        <h2>⑧ 新しい動画を始める</h2>
+        <p class="hint danger-hint">前の動画の台本 JSON・生成音声・画像・書き出し（<code>out/export</code>）・テロップスタイル・読み上げ辞書を<strong>すべて削除</strong>し、初期状態に戻します。<strong>元に戻せません。</strong></p>
+        <p class="hint muted-inline"><strong>消しません:</strong> <code>.env</code>、API キー用の環境変数、<code>node_modules</code>、<code>src</code> などのソースコード。</p>
+        <p class="hint muted-inline"><strong>ボタンが失敗するとき:</strong> プロジェクトフォルダでターミナルを開き <code>npm run reset-project はい</code> を実行すると、ブラウザなしで同じ消去ができます。</p>
+        <div class="btn-row" style="margin-top:12px">
+          <button type="button" class="btn danger" id="openResetModal">前作データをすべて消去…</button>
+        </div>
+        <p id="resetBanner" class="reset-banner" hidden></p>
+      </section>
+
+    </main>
+  </div>
+
+  <div id="resetModal" class="modal-root" aria-hidden="true">
+    <div class="modal-backdrop" id="resetModalBackdrop" tabindex="-1"></div>
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="resetModalTitle">
+      <h3 id="resetModalTitle">前作データをすべて消去しますか？</h3>
+      <p class="modal-lead">次のものが<strong>完全に削除</strong>または初期化されます。</p>
+      <ul class="reset-list">
+        <li><code>video-config.json</code>（台本）→ 空 <code>[]</code></li>
+        <li><code>telop-style.json</code>（テロップ見た目）→ 初期値</li>
+        <li><code>dictionary.json</code>（読み上げ辞書）→ 空</li>
+        <li><code>assets-manifest.json</code> → 音声・画像 0 件</li>
+        <li><code>public/drop/audio</code> 内の全ファイル</li>
+        <li><code>public/drop/images</code> 内の全ファイル</li>
+        <li><code>out/export</code> 内のすべて（過去の MP4 / SRT など）</li>
+        <li><code>out</code> 直下の動画・音声ファイル（例: Studio が出した <code>*.mp4</code>）</li>
+      </ul>
+      <p class="hint confirm-hint">実行するには、下の欄に <strong>はい</strong> または <strong>はい！</strong> とだけ入力してください（コピペ可）。</p>
+      <label class="reset-label" for="resetConfirmInput">確認入力</label>
+      <input type="text" id="resetConfirmInput" class="reset-confirm-input" autocomplete="off" placeholder="はい" />
+      <div class="modal-actions">
+        <button type="button" class="btn secondary" id="resetModalCancel">キャンセル</button>
+        <button type="button" class="btn danger" id="resetModalDo">消去を実行</button>
+      </div>
+      <p id="resetModalStatus" class="status reset-modal-status" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
