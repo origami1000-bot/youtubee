@@ -897,6 +897,58 @@ app.post("/api/telop-style", (req, res) => {
 });
 
 // ---- TTS 設定取得 ----
+/** .env ファイルの特定キーを更新（なければ末尾に追加） */
+function updateEnvFile(updates) {
+  const envPath = path.join(root, ".env");
+  let src = "";
+  try { src = fs.readFileSync(envPath, "utf8"); } catch {}
+
+  for (const [key, value] of Object.entries(updates)) {
+    const line = `${key}=${value}`;
+    const re = new RegExp(`^${key}=.*$`, "m");
+    if (re.test(src)) {
+      src = src.replace(re, line);
+    } else {
+      src = src.trimEnd() + "\n" + line + "\n";
+    }
+    // 実行中プロセスにも即反映
+    process.env[key] = value;
+  }
+  fs.writeFileSync(envPath, src, "utf8");
+}
+
+app.post("/api/tts/settings", (req, res) => {
+  try {
+    const b = req.body || {};
+    const updates = {};
+    if (b.elevenlabsApiKey  != null) updates["ELEVENLABS_API_KEY"]    = b.elevenlabsApiKey;
+    if (b.elevenlabsVoiceId != null) updates["ELEVENLABS_VOICE_ID"]   = b.elevenlabsVoiceId;
+    if (b.elevenlabsVoiceIdB!= null) updates["ELEVENLABS_VOICE_ID_B"] = b.elevenlabsVoiceIdB;
+    if (b.elevenlabsModel   != null) updates["ELEVENLABS_MODEL"]       = b.elevenlabsModel;
+    if (b.elevenlabsLanguage!= null) updates["ELEVENLABS_LANGUAGE"]    = b.elevenlabsLanguage;
+    if (b.openaiApiKey      != null) updates["OPENAI_API_KEY"]         = b.openaiApiKey;
+    if (b.openaiVoice       != null) updates["OPENAI_TTS_VOICE"]       = b.openaiVoice;
+    if (b.openaiModel       != null) updates["OPENAI_TTS_MODEL"]       = b.openaiModel;
+    if (b.geminiApiKey      != null) updates["GOOGLE_AI_STUDIO_API_KEY"] = b.geminiApiKey;
+    if (b.geminiVoice       != null) updates["GEMINI_TTS_VOICE"]       = b.geminiVoice;
+    if (b.geminiModel       != null) updates["GEMINI_TTS_MODEL"]       = b.geminiModel;
+    if (b.geminiInstruction != null) updates["GEMINI_TTS_INSTRUCTION"] = b.geminiInstruction;
+    if (b.aivisApiKey       != null) updates["AIVIS_API_KEY"]          = b.aivisApiKey;
+    if (b.aivisModelUuid    != null) updates["AIVIS_MODEL_UUID"]       = b.aivisModelUuid;
+    if (b.xaiApiKey         != null) updates["XAI_API_KEY"]            = b.xaiApiKey;
+    if (b.xaiVoice          != null) updates["XAI_TTS_VOICE"]          = b.xaiVoice;
+    if (b.xaiLanguage       != null) updates["XAI_TTS_LANGUAGE"]       = b.xaiLanguage;
+    if (b.ttsSpeed          != null) updates["TTS_SPEED"]              = String(b.ttsSpeed);
+    if (Object.keys(updates).length === 0) {
+      return res.json({ ok: true, note: "変更なし" });
+    }
+    updateEnvFile(updates);
+    res.json({ ok: true, saved: Object.keys(updates) });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 app.get("/api/tts/settings", (_req, res) => {
   res.json({
     ok: true,

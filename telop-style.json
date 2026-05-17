@@ -1,10 +1,10 @@
 {
-  "fontSize": 40,
+  "fontSize": 38,
   "color": "#ffffff",
   "fontFamily": "Meiryo",
   "fontWeight": "bold",
   "background": "none",
   "position": "top",
   "shadow": true,
-  "maxCharsPerLine": 40
+  "maxCharsPerLine": 50
 }

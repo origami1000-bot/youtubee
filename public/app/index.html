@@ -84,6 +84,10 @@
             <label>言語（ISO 639-1）</label>
             <input type="text" id="elevenlabsLanguage" value="en" placeholder="en" />
           </div>
+          <div style="grid-column:1/-1; display:flex; align-items:center; gap:10px; margin-top:4px">
+            <button type="button" id="saveElevenlabsSettings" class="btn" style="background:#7c3aed;color:#fff;padding:6px 18px">💾 設定を保存</button>
+            <span id="elevenlabsSaveStatus" style="font-size:0.85em;color:#16a34a"></span>
+          </div>
           <p class="hint" style="grid-column:1/-1;margin:0">
             <strong>英語</strong>の2人会話: <code>speech_text</code> に <code>A: [excited] Hello!</code> / <code>B: [curious] Really?</code> のように行を分けるか、
             <code>dialogue</code> 配列を使います。シーンごとに話者だけ変える場合は <code>"speaker": "a"</code> または <code>"b"</code>。

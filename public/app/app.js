@@ -819,3 +819,35 @@ function updateSpeedLabel(val) {
     updateSpeedLabel(slider.value);
   }
 })();
+
+// ---- ElevenLabs 設定を .env に保存 ----
+document.getElementById("saveElevenlabsSettings")?.addEventListener("click", async () => {
+  const status = document.getElementById("elevenlabsSaveStatus");
+  status.textContent = "保存中…";
+  status.style.color = "#64748b";
+  try {
+    const body = {
+      elevenlabsApiKey:   document.getElementById("elevenlabsApiKey").value.trim(),
+      elevenlabsVoiceId:  document.getElementById("elevenlabsVoiceId").value.trim(),
+      elevenlabsVoiceIdB: document.getElementById("elevenlabsVoiceIdB").value.trim(),
+      elevenlabsModel:    document.getElementById("elevenlabsModel").value,
+      elevenlabsLanguage: document.getElementById("elevenlabsLanguage").value.trim(),
+    };
+    const d = await safeFetch("/api/tts/settings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (d.ok) {
+      status.textContent = "✓ .env に保存しました";
+      status.style.color = "#16a34a";
+    } else {
+      status.textContent = "エラー: " + (d.error || "不明");
+      status.style.color = "#b91c1c";
+    }
+  } catch (e) {
+    status.textContent = "エラー: " + e.message;
+    status.style.color = "#b91c1c";
+  }
+  setTimeout(() => { status.textContent = ""; }, 4000);
+});
