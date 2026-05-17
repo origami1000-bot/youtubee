@@ -4,8 +4,20 @@ import { MainVideo } from "./MainVideo";
 import configData from "../video-config.json";
 import manifestData from "../assets-manifest.json";
 
-type AssetManifest = { audio?: string[]; images?: string[] };
+type AssetManifest = {
+  audio?:  Record<string, string> | string[];
+  images?: Record<string, string> | string[];
+};
 const manifest = manifestData as AssetManifest;
+
+function resolveManifestEntry(
+  field: Record<string, string> | string[] | undefined,
+  key: number
+): string {
+  if (!field) return "";
+  if (Array.isArray(field)) return field[key - 1] ?? "";
+  return (field as Record<string, string>)[String(key)] ?? "";
+}
 const scriptData: Array<{
   text: string;
   durationInSeconds?: number;
@@ -45,10 +57,11 @@ export const RemotionRoot: React.FC = () => {
         const scenes: Array<(typeof scriptData)[number] & { durationFrames: number; audioSrc: string }> = [];
         for (let i = 0; i < scriptData.length; i++) {
           const scene = scriptData[i];
+          // 音声はエントリー位置（1始まり）でルックアップ
+          const entryNum = i + 1;
           const audioRel =
-            manifest.audio?.[i] && manifest.audio[i].length > 0
-              ? manifest.audio[i]
-              : `drop/audio/${String(i + 1).padStart(2, "0")}_scene${i + 1}.mp3`;
+            resolveManifestEntry(manifest.audio, entryNum) ||
+            `drop/audio/${String(entryNum).padStart(2, "0")}_scene${entryNum}.mp3`;
           const audioSrc = staticFile(audioRel);
 
           const padSec =

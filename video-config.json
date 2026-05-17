@@ -1,266 +1,282 @@
 [
   {
     "scene": 1,
-    "speaker": "a",
-    "text": "老後のためにコツコツ積み立てたiDeCoと退職金。受け取り順序を1つ間違えると、手取りが100万円近く減ってしまうかもしれません",
-    "speech_text": "ろうごのためにコツコツ積み立てた、いでこと、たいしょくきん。受け取り順序をひとつ間違えると、手取りがひゃくまんえん近く減ってしまうかもしれません。",
-    "effect": "zoom-in",
-    "note": "【修正】税金地獄などの過度な煽りを削除し、具体的な損失額を提示"
+    "speaker": "kVmjBS7BmRr17sqzwVY7",
+    "text": "Hello, and welcome back to Across the Pond & Down Under — the podcast where I, a rather damp and confused Englishman, try to make sense of the wild political and social landscape of Australia. Today we're talking about something making headlines right across the country — the 2026 Federal Budget, and what it actually means for older Australians. To help me understand, I'm joined by Peter from the Gold Coast. Peter, welcome to the show!",
+    "speech_text": "Hello, and welcome back to Across the Pond and Down Under — the podcast where I, a rather damp and confused Englishman, try to make sense of the wild political and social landscape of Australia. Today we're talking about something making headlines right across the country — the 2026 Federal Budget, and what it actually means for older Australians. To help me understand, I'm joined by Peter from the Gold Coast. Peter, welcome to the show!",
+    "effect": "zoom-in"
+  },
+  {
+    "scene": 1,
+    "speaker": "FAu9wa3gWCQ1SacKReJk",
+    "text": "[sighs] Cheers, Oliver. Good to be here. I think.",
+    "speech_text": "[sighs] Cheers, Oliver. Good to be here. I think.",
+    "effect": "none"
+  },
+  {
+    "scene": 1,
+    "speaker": "kVmjBS7BmRr17sqzwVY7",
+    "text": "Now Peter — the government just announced a massive aged care package. Billions of dollars. Thousands of new home care spots. Sounds rather positive, doesn't it?",
+    "speech_text": "Now Peter — the government just announced a massive aged care package. Billions of dollars. Thousands of new home care spots. Sounds rather positive, doesn't it?",
+    "effect": "none"
+  },
+  {
+    "scene": 1,
+    "speaker": "FAu9wa3gWCQ1SacKReJk",
+    "text": "[laughs bitterly] Does it? Oliver, mate, with all due respect — you're dreaming. You're sitting over there drinking your weak tea, looking at a press release and thinking it's a victory lap. Tell you what — why don't you ask ME what it actually means on the ground?",
+    "speech_text": "[laughs bitterly] Does it? Oliver, mate, with all due respect — you're dreaming. You're sitting over there drinking your weak tea, looking at a press release and thinking it's a victory lap. Tell you what — why don't you ask ME what it actually means on the ground?",
+    "effect": "none"
+  },
+  {
+    "scene": 1,
+    "speaker": "kVmjBS7BmRr17sqzwVY7",
+    "text": "...Alright then. Peter, what does it actually mean on the ground?",
+    "speech_text": "...Alright then. Peter, what does it actually mean on the ground?",
+    "effect": "none"
   },
   {
     "scene": 2,
-    "speaker": "a",
-    "text": "皆さんこんにちは少しだけお金に詳しい聖子です実は私もiDeCoを月に2万円かけていて今運用率が20パーセントくらいあるんですコツコツ増えるのは嬉しいですが問題は受け取り方なんです今回は2026年から変わったiDeCoと退職金の出口戦略について解説します",
-    "speech_text": "みなさんこんにちは。少しだけお金に詳しい、せいこです。実は、わたしも、いでこを、月ににまんえんかけていて、今、うんようりつが、にじゅっパーセントくらいあるんです！コツコツ増えるのは嬉しいですが、問題は受け取り方なんです。今回は、にせん・にじゅう・ろくねんから変わった、いでこと、たいしょくきんのでぐちせんりゃくについて解説します。",
-    "effect": "none",
-    "note": "【修正】一次情報（月2万、運用率20%）を自然に挿入し、実践者としての信頼性を構築"
+    "speaker": "FAu9wa3gWCQ1SacKReJk",
+    "text": "[sighs heavily] It means 347 days of waiting, Oliver. 266,000 of us stuck in limbo. THAT'S what it means.",
+    "speech_text": "[sighs heavily] It means 347 days of waiting, Oliver. 266,000 of us stuck in limbo. THAT'S what it means.",
+    "effect": "zoom-in"
+  },
+  {
+    "scene": 2,
+    "speaker": "kVmjBS7BmRr17sqzwVY7",
+    "text": "[gasps] Good heavens. Nearly a year.",
+    "speech_text": "[gasps] Good heavens. Nearly a year.",
+    "effect": "none"
+  },
+  {
+    "scene": 2,
+    "speaker": "FAu9wa3gWCQ1SacKReJk",
+    "text": "Nearly a year. And counting.",
+    "speech_text": "Nearly a year. And counting.",
+    "effect": "none"
+  },
+  {
+    "scene": 2,
+    "speaker": "kVmjBS7BmRr17sqzwVY7",
+    "text": "But surely — 9,500 new home care packages must help? That's quite a significant number.",
+    "speech_text": "But surely — 9,500 new home care packages must help? That's quite a significant number.",
+    "effect": "none"
+  },
+  {
+    "scene": 2,
+    "speaker": "FAu9wa3gWCQ1SacKReJk",
+    "text": "[laughs bitterly] Mate. There are 266,000 people on the waitlist. And they're giving us 9,500 spots. Do you know what that is? That's trying to put out a house fire with a water pistol.",
+    "speech_text": "[laughs bitterly] Mate. There are 266,000 people on the waitlist. And they're giving us 9,500 spots. Do you know what that is? That's trying to put out a house fire with a water pistol.",
+    "effect": "none"
+  },
+  {
+    "scene": 2,
+    "speaker": "kVmjBS7BmRr17sqzwVY7",
+    "text": "I... yes, when you put it like that...",
+    "speech_text": "I... yes, when you put it like that...",
+    "effect": "none"
+  },
+  {
+    "scene": 2,
+    "speaker": "FAu9wa3gWCQ1SacKReJk",
+    "text": "I'm 65, Oliver. I've worked hard, paid my taxes for forty years, and my knees sound like a pair of maracas when I walk down the stairs. [laughs] I just need a bit of support at home so I don't end up in a residential facility taking up a bed. Is that too much to ask?",
+    "speech_text": "I'm 65, Oliver. I've worked hard, paid my taxes for forty years, and my knees sound like a pair of maracas when I walk down the stairs. [laughs] I just need a bit of support at home so I don't end up in a residential facility taking up a bed. Is that too much to ask?",
+    "effect": "none"
+  },
+  {
+    "scene": 2,
+    "speaker": "kVmjBS7BmRr17sqzwVY7",
+    "text": "Not at all, it sounds entirely reasonable—",
+    "speech_text": "Not at all, it sounds entirely reasonable—",
+    "effect": "none"
+  },
+  {
+    "scene": 2,
+    "speaker": "FAu9wa3gWCQ1SacKReJk",
+    "text": "[excited] And as Senator Allman-Payne said — people are literally dying while they wait, Oliver. Dying. On. The. Waitlist.",
+    "speech_text": "[excited] And as Senator Allman-Payne said — people are literally dying while they wait, Oliver. Dying. On. The. Waitlist.",
+    "effect": "none"
+  },
+  {
+    "scene": 2,
+    "speaker": "kVmjBS7BmRr17sqzwVY7",
+    "text": "[gasps] That's... that's quite sobering.",
+    "speech_text": "[gasps] That's... that's quite sobering.",
+    "effect": "none"
+  },
+  {
+    "scene": 2,
+    "speaker": "FAu9wa3gWCQ1SacKReJk",
+    "text": "It's worse than sobering. It's a national disgrace. [sighs] They're rationing care, mate. Like it's a luxury item.",
+    "speech_text": "It's worse than sobering. It's a national disgrace. [sighs] They're rationing care, mate. Like it's a luxury item.",
+    "effect": "none"
   },
   {
     "scene": 3,
-    "speaker": "a",
-    "text": "結論から言うと受け取る順番を1つ間違えるだけで手取りが数十万円から100万円近く減ってしまう恐れがあるんです",
-    "speech_text": "結論から言うと、受け取る順番をひとつ間違えるだけで、手取りが数十万円から、ひゃくまんえん近く減ってしまう恐れがあるんです。",
-    "effect": "zoom-out",
-    "note": ""
+    "speaker": "kVmjBS7BmRr17sqzwVY7",
+    "text": "What about the new co-payments? Asking wealthier older Australians to contribute a little for non-clinical services — help around the house, that sort of thing? Seems rather fair, doesn't it?",
+    "speech_text": "What about the new co-payments? Asking wealthier older Australians to contribute a little for non-clinical services — help around the house, that sort of thing? Seems rather fair, doesn't it?",
+    "effect": "pan-right"
+  },
+  {
+    "scene": 3,
+    "speaker": "FAu9wa3gWCQ1SacKReJk",
+    "text": "[laughs] Leave it to an economist to make getting help putting your socks on sound like a dodgy casino bet. [sighs] Every single person in this program has already been assessed by a clinician. We aren't ordering extra home care like it's a side of chips! We NEED it.",
+    "speech_text": "[laughs] Leave it to an economist to make getting help putting your socks on sound like a dodgy casino bet. [sighs] Every single person in this program has already been assessed by a clinician. We aren't ordering extra home care like it's a side of chips! We NEED it.",
+    "effect": "none"
+  },
+  {
+    "scene": 3,
+    "speaker": "kVmjBS7BmRr17sqzwVY7",
+    "text": "But the public purse—",
+    "speech_text": "But the public purse—",
+    "effect": "none"
+  },
+  {
+    "scene": 3,
+    "speaker": "FAu9wa3gWCQ1SacKReJk",
+    "text": "[excited] If they price people out of home care with these co-payments — people skip the care. Then they fall over. End up in the emergency department. Get pushed into residential aged care. Which costs the taxpayer a HELL of a lot more! It's penny wise and pound foolish!",
+    "speech_text": "[excited] If they price people out of home care with these co-payments — people skip the care. Then they fall over. End up in the emergency department. Get pushed into residential aged care. Which costs the taxpayer a HELL of a lot more! It's penny wise and pound foolish!",
+    "effect": "none"
+  },
+  {
+    "scene": 3,
+    "speaker": "kVmjBS7BmRr17sqzwVY7",
+    "text": "So you're saying the short-term saving creates a much larger long-term cost.",
+    "speech_text": "So you're saying the short-term saving creates a much larger long-term cost.",
+    "effect": "none"
+  },
+  {
+    "scene": 3,
+    "speaker": "FAu9wa3gWCQ1SacKReJk",
+    "text": "[sighs] Now you're getting it, mate. Took you a while, but you got there.",
+    "speech_text": "[sighs] Now you're getting it, mate. Took you a while, but you got there.",
+    "effect": "none"
   },
   {
     "scene": 4,
-    "speaker": "a",
-    "text": "せっかくの老後資金が税金で大きく減ってしまうのは絶対に避けたいですよね今日は損をしないための正しい受け取り方を徹底的に解説します",
-    "speech_text": "せっかくのろうごしきんが、ぜいきんで大きく減ってしまうのは、絶対に避けたいですよね。今日は、損をしないための正しい受け取り方を徹底的に解説します。",
-    "effect": "pan-right",
-    "note": "【修正】消えてしまう→大きく減ってしまう、と表現を正確化"
+    "speaker": "kVmjBS7BmRr17sqzwVY7",
+    "text": "So the frustration isn't just about money — it's about feeling abandoned by the system?",
+    "speech_text": "So the frustration isn't just about money — it's about feeling abandoned by the system?",
+    "effect": "zoom-out"
+  },
+  {
+    "scene": 4,
+    "speaker": "FAu9wa3gWCQ1SacKReJk",
+    "text": "[excited] Exactly, mate! We're an easy target. Albo stands up there talking about seeing our people through the hard times — but it's all hot air. They promise you the world. And then you're 65, your private health costs are up, your investments are hit, and you're waiting nearly a year to get a bloke to come install a shower grab-rail.",
+    "speech_text": "[excited] Exactly, mate! We're an easy target. Albo stands up there talking about seeing our people through the hard times — but it's all hot air. They promise you the world. And then you're 65, your private health costs are up, your investments are hit, and you're waiting nearly a year to get a bloke to come install a shower grab-rail.",
+    "effect": "none"
+  },
+  {
+    "scene": 4,
+    "speaker": "kVmjBS7BmRr17sqzwVY7",
+    "text": "A shower grab-rail. Not exactly asking for the moon, is it.",
+    "speech_text": "A shower grab-rail. Not exactly asking for the moon, is it.",
+    "effect": "none"
+  },
+  {
+    "scene": 4,
+    "speaker": "FAu9wa3gWCQ1SacKReJk",
+    "text": "[laughs bitterly] Not the last time I checked, no.",
+    "speech_text": "[laughs bitterly] Not the last time I checked, no.",
+    "effect": "none"
   },
   {
     "scene": 5,
-    "speaker": "a",
-    "text": "まず基礎知識として退職金やiDeCoを一時金で受け取る場合退職所得控除という税金の優遇制度が使えます",
-    "speech_text": "まず基礎知識として、たいしょくきんやいでこを一時金で受け取る場合、たいしょくしょとくこうじょという、ぜいきんの優遇制度が使えます。",
-    "effect": "zoom-in",
-    "note": "【修正】税金のバリア→優遇制度へ統一"
+    "speaker": "kVmjBS7BmRr17sqzwVY7",
+    "text": "[laughs] Well, look on the bright side, Peter — you do live on the beautiful Gold Coast! Endless sunshine, gorgeous beaches. Perhaps the sea air will sort everything out?",
+    "speech_text": "[laughs] Well, look on the bright side, Peter — you do live on the beautiful Gold Coast! Endless sunshine, gorgeous beaches. Perhaps the sea air will sort everything out?",
+    "effect": "zoom-in"
+  },
+  {
+    "scene": 5,
+    "speaker": "FAu9wa3gWCQ1SacKReJk",
+    "text": "[laughs] Mate, I already eat Vegemite by the spoonful! But a view of the beach doesn't help when your knees are shot. The irony isn't lost on me. We live in paradise — yet my blood pressure only goes down when I'm at the pub having a cold one.",
+    "speech_text": "[laughs] Mate, I already eat Vegemite by the spoonful! But a view of the beach doesn't help when your knees are shot. The irony isn't lost on me. We live in paradise — yet my blood pressure only goes down when I'm at the pub having a cold one.",
+    "effect": "none"
+  },
+  {
+    "scene": 5,
+    "speaker": "kVmjBS7BmRr17sqzwVY7",
+    "text": "I certainly hope the politicians in Canberra are listening to people like you, Peter.",
+    "speech_text": "I certainly hope the politicians in Canberra are listening to people like you, Peter.",
+    "effect": "none"
+  },
+  {
+    "scene": 5,
+    "speaker": "FAu9wa3gWCQ1SacKReJk",
+    "text": "[sighs] They aren't listening, Oliver. They're just hoping we forget about it. Or expire while on the waitlist. [laughs bitterly] Whichever comes first.",
+    "speech_text": "[sighs] They aren't listening, Oliver. They're just hoping we forget about it. Or expire while on the waitlist. [laughs bitterly] Whichever comes first.",
+    "effect": "none"
   },
   {
     "scene": 6,
-    "speaker": "a",
-    "text": "これは長年頑張って働いた人への報酬のようなもので一定の金額までは税金が大幅に軽減される非常に有利な制度です",
-    "speech_text": "これは長年頑張って働いた人への、ご褒美のようなもので、一定の金額までは、ぜいきんが大幅に軽減される、非常に有利な制度です。",
-    "effect": "none",
-    "note": ""
+    "speaker": "kVmjBS7BmRr17sqzwVY7",
+    "text": "Now Peter, before we wrap up — is there anything that gives you hope?",
+    "speech_text": "Now Peter, before we wrap up — is there anything that gives you hope?",
+    "effect": "pan-left"
+  },
+  {
+    "scene": 6,
+    "speaker": "FAu9wa3gWCQ1SacKReJk",
+    "text": "Hope? Oliver, I— [gasps] Hang on a sec, mate. That's my phone. Unknown number from Canberra... strewth! This could be it! This could be My Aged Care finally calling!",
+    "speech_text": "Hope? Oliver, I— [gasps] Hang on a sec, mate. That's my phone. Unknown number from Canberra... strewth! This could be it! This could be My Aged Care finally calling!",
+    "effect": "none"
+  },
+  {
+    "scene": 6,
+    "speaker": "kVmjBS7BmRr17sqzwVY7",
+    "text": "[excited] Oh, brilliant! Live on the podcast! Go on, answer it!",
+    "speech_text": "[excited] Oh, brilliant! Live on the podcast! Go on, answer it!",
+    "effect": "none"
+  },
+  {
+    "scene": 6,
+    "speaker": "FAu9wa3gWCQ1SacKReJk",
+    "text": "Hello? Yes, this is Peter... Yes, I am over 65... Yes, I have been waiting... Wait — what? [gasps] No, I don't need discounted solar panels! I don't even own a bloody roof in Canberra, I'm on the Coast! [sighs heavily]",
+    "speech_text": "Hello? Yes, this is Peter... Yes, I am over 65... Yes, I have been waiting... Wait — what? [gasps] No, I don't need discounted solar panels! I don't even own a bloody roof in Canberra, I'm on the Coast! [sighs heavily]",
+    "effect": "none"
   },
   {
     "scene": 7,
-    "speaker": "a",
-    "text": "しかしこの制度には大きな注意点が1つありますそれは退職金とiDeCoで同じ控除枠を共有しているということです",
-    "speech_text": "しかし、この制度には大きな注意点がひとつあります。それは、たいしょくきんといでこで、同じこうじょ枠を共有しているということです。",
-    "effect": "zoom-out",
-    "note": ""
+    "speaker": "kVmjBS7BmRr17sqzwVY7",
+    "text": "...Not the assessment team, then?",
+    "speech_text": "...Not the assessment team, then?",
+    "effect": "zoom-in"
+  },
+  {
+    "scene": 7,
+    "speaker": "FAu9wa3gWCQ1SacKReJk",
+    "text": "[laughs bitterly] Bloody telemarketer. I tell you what, Oliver — if they could harness the energy of my sheer rage right now, they wouldn't need to sell solar panels in Australia ever again.",
+    "speech_text": "[laughs bitterly] Bloody telemarketer. I tell you what, Oliver — if they could harness the energy of my sheer rage right now, they wouldn't need to sell solar panels in Australia ever again.",
+    "effect": "none"
   },
   {
     "scene": 8,
-    "speaker": "a",
-    "text": "つまり同じ時期に両方を受け取ってしまうと控除枠が重複してしまいあふれた部分に多額の税金がかかってしまうんです",
-    "speech_text": "つまり、同じ時期に両方を受け取ってしまうと、こうじょ枠が重複してしまい、あふれた部分に多額の、ぜいきんがかかってしまうんです。",
-    "effect": "pan-left",
-    "note": "【修正】食い合ってしまい→重複してしまい"
+    "speaker": "kVmjBS7BmRr17sqzwVY7",
+    "text": "[laughs] That is genuinely the most Australian thing I have ever heard. Peter, thank you so much for joining us. We're rooting for you.",
+    "speech_text": "[laughs] That is genuinely the most Australian thing I have ever heard. Peter, thank you so much for joining us. We're rooting for you.",
+    "effect": "zoom-out"
   },
   {
-    "scene": 9,
-    "speaker": "a",
-    "text": "実は私の知り合いの女性も同じケースで申請し手取り額が予定より60万円以上少なくなって帰り道に悔しくて涙が出たと話していました",
-    "speech_text": "実は私の知り合いの女性も同じケースで申請し、手取り額が予定より、ろくじゅうまんえん以上少なくなって、帰り道に悔しくて涙が出たと話していました。",
-    "effect": "zoom-in",
-    "note": "【修正】差額67万の事例と整合を取るため60万円以上に変更"
+    "scene": 8,
+    "speaker": "FAu9wa3gWCQ1SacKReJk",
+    "text": "Cheers, Oliver. [sighs] I'll just go back to waiting. Only 346 days to go.",
+    "speech_text": "Cheers, Oliver. [sighs] I'll just go back to waiting. Only 346 days to go.",
+    "effect": "none"
   },
   {
-    "scene": 10,
-    "speaker": "a",
-    "text": "彼女は会社の退職金とiDeCoを同じ年にまとめて受け取ってしまったため控除枠をはみ出した分に多くの税金がかかってしまったんです",
-    "speech_text": "彼女は会社の、たいしょくきんといでこを、同じ年にまとめて受け取ってしまったため、こうじょ枠をはみ出した分に、多くの、ぜいきんがかかってしまったんです。",
-    "effect": "none",
-    "note": ""
+    "scene": 8,
+    "speaker": "kVmjBS7BmRr17sqzwVY7",
+    "text": "Until next time, everyone. I'm Oliver — still confused, still learning. Goodbye!",
+    "speech_text": "Until next time, everyone. I'm Oliver — still confused, still learning. Goodbye!",
+    "effect": "none"
   },
   {
-    "scene": 11,
-    "speaker": "a",
-    "text": "この問題を避けるためには受け取る時期をずらす必要がありますがここで気をつけなければならない重要なルールが2つあります",
-    "speech_text": "この問題を避けるためには、受け取る時期をずらす必要がありますが、ここで気をつけなければならない重要なルールがふたつあります。",
-    "effect": "zoom-out",
-    "note": ""
-  },
-  {
-    "scene": 12,
-    "speaker": "a",
-    "text": "1つ目は退職金を先に受け取ってからiDeCoを受け取る場合です。この場合は20年以上間を空けないと控除をそれぞれフルに使えません",
-    "speech_text": "ひとつ目は、たいしょくきんを先に受け取ってから、いでこを受け取る場合です。この場合は、にじゅうねん以上間を空けないと、こうじょをそれぞれフルに使えません。",
-    "effect": "pan-right",
-    "note": "【修正】19年ルール→20年以上間を空けないとフルで使えない、と正確に記載"
-  },
-  {
-    "scene": 13,
-    "speaker": "a",
-    "text": "60歳で退職金を受け取ったら80歳を過ぎないとiDeCoの一時金を満額控除で受け取れないということですこの順番は現実的ではありませんよね",
-    "speech_text": "ろくじゅっさいで、たいしょくきんを受け取ったら、はちじゅっさいを過ぎないと、いでこの一時金を満額こうじょで受け取れないということです。この順番は現実的ではありませんよね。",
-    "effect": "zoom-in",
-    "note": "【修正】79歳まで→80歳を過ぎないと"
-  },
-  {
-    "scene": 14,
-    "speaker": "a",
-    "text": "そこでこれまでの正解はiDeCoを先に受け取り5年待ってから会社の退職金を受け取るという5年ルールを活用することでした",
-    "speech_text": "そこでこれまでの正解は、いでこを先に受け取り、ごねん待ってから会社の、たいしょくきんを受け取るという、ごねんるーるを活用することでした。",
-    "effect": "none",
-    "note": ""
-  },
-  {
-    "scene": 15,
-    "speaker": "a",
-    "text": "しかし2026年1月からこの5年ルールが10年ルールに変更されました受け取り方の常識が根本から変わってしまったんです",
-    "speech_text": "しかし、にせん・にじゅう・ろくねん、いちがつから、このごねんるーるが、じゅうねんるーるに変更されました。受け取り方の常識が根本から変わってしまったんです。",
-    "effect": "zoom-out",
-    "note": "【修正】ほぼ決定→2026年1月からの変更の事実へ記載変更"
-  },
-  {
-    "scene": 16,
-    "speaker": "a",
-    "text": "60歳でiDeCoを受け取ったら70歳まで会社の退職金の控除をフルに活用できないというスケジュールになってしまうんです",
-    "speech_text": "ろくじゅっさいで、いでこを受け取ったら、ななじゅっさいまで会社の、たいしょくきんのこうじょをフルに活用できないというスケジュールになってしまうんです。",
-    "effect": "pan-left",
-    "note": ""
-  },
-  {
-    "scene": 17,
-    "speaker": "a",
-    "text": "退職の時期は自分で自由に決められない方も多いはずです自分の場合はどうなのかと気になった方は早めに確認して対策を取ることが大切です",
-    "speech_text": "退職の時期は自分で自由に決められないかたも多いはずです。自分の場合はどうなのかと気になったかたは、早めに確認して対策を取ることが大切です。",
-    "effect": "zoom-in",
-    "note": ""
-  },
-  {
-    "scene": 18,
-    "speaker": "a",
-    "text": "概要欄のLINEからプロのFPに無料シミュレーションを依頼してみてください専門家の知識を借りれば自分に合った最適な受け取り方を見つけられます",
-    "speech_text": "概要欄のらいんから、プロのえふぴーに、無料シミュレーションを依頼してみてください。専門家の知識を借りれば、自分に合った最適な受け取り方を見つけられます。",
-    "effect": "none",
-    "note": ""
-  },
-  {
-    "scene": 19,
-    "speaker": "a",
-    "text": "ではここで具体的なケーススタディを見てみましょうまずは受け取り方を知らなかった田中さんのケースです",
-    "speech_text": "ではここで、具体的なケーススタディを見てみましょう。まずは受け取り方を知らなかった、たなかさんのケースです。",
-    "effect": "zoom-out",
-    "note": ""
-  },
-  {
-    "scene": 20,
-    "speaker": "a",
-    "text": "田中さんは勤続30年で退職金2000万円iDeCoで500万円を貯めていましたが何も知らずに60歳で同じ年に両方受け取りました",
-    "speech_text": "たなかさんは勤続さんじゅうねんで、たいしょくきん、にせんまんえん、いでこで、ごひゃくまんえんを貯めていましたが、何も知らずに、ろくじゅっさいで同じ年に両方受け取りました。",
-    "effect": "pan-right",
-    "note": ""
-  },
-  {
-    "scene": 21,
-    "speaker": "a",
-    "text": "その結果退職所得控除の枠を大きくはみ出してしまい所得税と住民税を合わせて約107万円を支払うことになりました",
-    "speech_text": "その結果、たいしょくしょとくこうじょの枠を大きくはみ出してしまい、しょとくぜいと、じゅうみんぜいを合わせて、約ひゃくななまんえんを支払うことになりました。",
-    "effect": "zoom-in",
-    "note": ""
-  },
-  {
-    "scene": 22,
-    "speaker": "a",
-    "text": "一方で賢い受け取り方を選んだ鈴木さんのケースを見てみましょう鈴木さんは同じ金額を持っていましたが受け取り方を工夫しました",
-    "speech_text": "一方で、賢い受け取り方を選んだ、すずきさんのケースを見てみましょう。すずきさんは同じ金額を持っていましたが、受け取り方を工夫しました。",
-    "effect": "none",
-    "note": ""
-  },
-  {
-    "scene": 23,
-    "speaker": "a",
-    "text": "鈴木さんは60歳で退職金を一時金として受け取りiDeCoの500万円は年金形式つまり分割で受け取ることにしたんです",
-    "speech_text": "すずきさんは、ろくじゅっさいで、たいしょくきんを一時金として受け取り、いでこの、ごひゃくまんえんは、ねんきん形式、つまり分割で受け取ることにしたんです。",
-    "effect": "zoom-out",
-    "note": ""
-  },
-  {
-    "scene": 24,
-    "speaker": "a",
-    "text": "iDeCoを分割で受け取ると公的年金等控除という別の優遇制度が使えるため鈴木さんの支払う税金は約40万円で済みました",
-    "speech_text": "いでこを分割で受け取ると、こうてきねんきんとうこうじょという、別の優遇制度が使えるため、すずきさんの支払う、ぜいきんは、約よんじゅうまんえんで済みました。",
-    "effect": "pan-left",
-    "note": ""
-  },
-  {
-    "scene": 25,
-    "speaker": "a",
-    "text": "つまり田中さんと鈴木さんでは知識の差だけで手取り額に約67万円もの大きな差が生まれてしまったのです",
-    "speech_text": "つまり、たなかさんと、すずきさんでは、知識の差だけで、手取り額に、約ろくじゅうななまんえんもの大きな差が生まれてしまったのです。",
-    "effect": "zoom-in",
-    "note": "【修正】約67万円の差と正確に記載"
-  },
-  {
-    "scene": 26,
-    "speaker": "a",
-    "text": "しかし年金形式にも注意が必要な点があります。それは社会保険料や国民健康保険料への影響です",
-    "speech_text": "しかし、ねんきん形式にも注意が必要な点があります。それは、しゃかいほけんりょうや、こくみんけんこうほけんりょうへの影響です。",
-    "effect": "none",
-    "note": ""
-  },
-  {
-    "scene": 27,
-    "speaker": "a",
-    "text": "収入が増えることで翌年の保険料が上がり結果的に一時金でもらうより負担が大きくなってしまうケースも少なくありません",
-    "speech_text": "収入が増えることで、翌年の保険料が上がり、結果的に一時金でもらうより、負担が大きくなってしまうケースも少なくありません。",
-    "effect": "zoom-out",
-    "note": ""
-  },
-  {
-    "scene": 28,
-    "speaker": "a",
-    "text": "詳細な年金制度や保険料等級表については日本年金機構の公式サイトのリンクを概要欄に貼っておきますのでぜひ参考にしてください",
-    "speech_text": "詳細な、ねんきん制度や、保険料、等級表については、にほんねんきんきこうの公式サイトのリンクを、概要欄に貼っておきますので、ぜひ参考にしてください。",
-    "effect": "pan-right",
-    "note": ""
-  },
-  {
-    "scene": 29,
-    "speaker": "a",
-    "text": "何より重要なのは自分の退職金額とiDeCoの積立額から一番手取りが多くなる最適な受け取り方を事前に計算しておくことです",
-    "speech_text": "何より重要なのは、自分の、たいしょくきん額と、いでこの積立額から、一番手取りが多くなる最適な受け取り方を事前に計算しておくことです。",
-    "effect": "zoom-in",
-    "note": ""
-  },
-  {
-    "scene": 30,
-    "speaker": "a",
-    "text": "一度受け取り方を決めて手続きをしてしまうともう変更はできません後で気づいた時には取り返しがつかないんです",
-    "speech_text": "一度受け取り方を決めて手続きをしてしまうと、もう変更はできません。後で気づいた時には、取り返しがつかないんです。",
-    "effect": "none",
-    "note": ""
-  },
-  {
-    "scene": 31,
-    "speaker": "a",
-    "text": "役所の窓口や会社の担当者はあなたにとって一番得になる方法をわざわざ教えてくれるわけではありません",
-    "speech_text": "役所の窓口や会社の担当者は、あなたにとって一番得になる方法を、わざわざ教えてくれるわけではありません。",
-    "effect": "zoom-out",
-    "note": ""
-  },
-  {
-    "scene": 32,
-    "speaker": "a",
-    "text": "一人で抱え込まずに概要欄のLINEから完全無料のプロのFP相談をぜひ活用してみてください",
-    "speech_text": "一人で抱え込まずに、概要欄のらいんから、完全無料の、プロのえふぴー相談をぜひ活用してみてください。",
-    "effect": "pan-left",
-    "note": ""
-  },
-  {
-    "scene": 33,
-    "speaker": "a",
-    "text": "自分に合った受け取り方を専門家と一緒に確認するのが一番確実な方法ですあなたの大切な老後資金をしっかり守りましょう",
-    "speech_text": "自分に合った受け取り方を専門家と一緒に確認するのが、一番確実な方法です。あなたの大切な、ろうごしきんをしっかり守りましょう。",
-    "effect": "zoom-in",
-    "note": ""
+    "scene": 8,
+    "speaker": "FAu9wa3gWCQ1SacKReJk",
+    "text": "[laughs] She'll be right, mate. Probably.",
+    "speech_text": "[laughs] She'll be right, mate. Probably.",
+    "effect": "none"
   }
 ]

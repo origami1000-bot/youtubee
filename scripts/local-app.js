@@ -227,20 +227,32 @@ function ensureDirs() {
 const AUDIO_EXT = /\.(mp3|wav|m4a|aac)$/i;
 const IMAGE_EXT = /\.(png|jpg|jpeg|webp)$/i;
 
+function parseSceneNumber(filename) {
+  const m = filename.match(/^(?:scene)?0*(\d+)/i);
+  return m ? parseInt(m[1], 10) : null;
+}
+
 function syncManifestInline() {
-  function listFiles(dir, subRel, extRe) {
-    if (!fs.existsSync(dir)) return [];
-    return fs
+  function listFilesAsObject(dir, subRel, extRe) {
+    if (!fs.existsSync(dir)) return {};
+    const files = fs
       .readdirSync(dir)
       .filter((f) => extRe.test(f))
-      .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
-      .map((f) => `${subRel}/${f}`);
+      .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+    const obj = {};
+    for (const f of files) {
+      const n = parseSceneNumber(f);
+      if (n === null) continue;
+      const key = String(n);
+      if (!obj[key]) obj[key] = `${subRel}/${f}`;
+    }
+    return obj;
   }
   const dropAudio = path.join(root, "public", "drop", "audio");
   const dropImages = path.join(root, "public", "drop", "images");
   const manifest = {
-    audio: listFiles(dropAudio, "drop/audio", AUDIO_EXT),
-    images: listFiles(dropImages, "drop/images", IMAGE_EXT),
+    audio:  listFilesAsObject(dropAudio,  "drop/audio",  AUDIO_EXT),
+    images: listFilesAsObject(dropImages, "drop/images", IMAGE_EXT),
   };
   fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + "\n", "utf8");
   return manifest;
@@ -327,6 +339,15 @@ function xaiTtsRequest(apiKey, text, voiceId, language) {
 }
 
 // ---- ElevenLabs TTS（v3 オーディオタグ対応） ----
+/** テキスト末尾が文末記号で終わっていない場合に "." を補う（ElevenLabs v3 の末尾繰り返し/途切れ対策） */
+function ensureEndPunctuation(text) {
+  const t = (text || "").trimEnd();
+  if (!t) return t;
+  // 絵文字・記号系を除いた最後の文字が文末記号かどうか
+  if (/[.!?…。！？~\-"]$/.test(t)) return t;
+  return t + ".";
+}
+
 function elevenlabsTtsRequest(apiKey, text, voiceId, model, languageCodeOverride) {
   const voice = (voiceId || "").trim();
   if (!voice) {
@@ -340,7 +361,9 @@ function elevenlabsTtsRequest(apiKey, text, voiceId, model, languageCodeOverride
   const timeoutMs =
     Number.isFinite(parsedTimeout) && parsedTimeout >= 30000 ? parsedTimeout : 180000;
 
-  const payload = { text, model_id: modelId };
+  // 末尾記号補完（繰り返し・途切れ防止）
+  const safeText = ensureEndPunctuation(text);
+  const payload = { text: safeText, model_id: modelId };
   if (languageCode) payload.language_code = languageCode;
 
   const stability = parseFloat(process.env.ELEVENLABS_STABILITY || "");
@@ -445,7 +468,12 @@ function elevenlabsDialogueRequest(apiKey, inputs, model, languageCodeOverride) 
   const timeoutMs =
     Number.isFinite(parsedTimeout) && parsedTimeout >= 30000 ? parsedTimeout : 240000;
 
-  const payload = { inputs, model_id: modelId };
+  // dialogue の各行も末尾記号補完
+  const safeInputs = inputs.map((inp) => ({
+    ...inp,
+    text: ensureEndPunctuation(inp.text),
+  }));
+  const payload = { inputs: safeInputs, model_id: modelId };
   if (languageCode) payload.language_code = languageCode;
 
   const stability = parseFloat(process.env.ELEVENLABS_STABILITY || "");
@@ -529,7 +557,10 @@ function normalizeDialogueSpeaker(raw) {
 }
 
 function speakerToElevenVoiceId(speaker, voiceA, voiceB) {
-  return normalizeDialogueSpeaker(speaker) === "b" ? voiceB : voiceA;
+  const s = String(speaker == null ? "" : speaker).trim();
+  // Voice ID を直接書いている場合（長い英数字文字列）はそのまま使う
+  if (s.length > 10 && /^[A-Za-z0-9]+$/.test(s)) return s;
+  return normalizeDialogueSpeaker(s) === "b" ? voiceB : voiceA;
 }
 
 /** A: Hello\nB: Hi 形式をパース */
@@ -939,11 +970,13 @@ async function generateAudioBuffer(
   }
   if (prov === "elevenlabs") {
     if (elevenlabsExtra && elevenlabsExtra.mode === "dialogue") {
+      console.log(`[ElevenLabs] dialogue mode: ${elevenlabsExtra.inputs.length} inputs`);
       return withRetry(() =>
         elevenlabsDialogueRequest(apiKey, elevenlabsExtra.inputs, model, ttsLanguage)
       );
     }
     const voice = (elevenlabsExtra && elevenlabsExtra.voiceId) || voiceParam;
+    console.log(`[ElevenLabs] TTS voice_id="${voice}" text="${(ttsText || "").slice(0, 40)}..."`);
     return withRetry(() => elevenlabsTtsRequest(apiKey, ttsText, voice, model, ttsLanguage));
   }
   throw new Error(`未対応の TTS プロバイダー: ${provider}`);

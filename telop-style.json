@@ -1,10 +1,10 @@
 {
-  "fontSize": 35,
+  "fontSize": 40,
   "color": "#ffffff",
-  "fontFamily": "Yu Gothic",
+  "fontFamily": "Meiryo",
   "fontWeight": "bold",
   "background": "none",
   "position": "top",
   "shadow": true,
-  "maxCharsPerLine": 22
+  "maxCharsPerLine": 40
 }

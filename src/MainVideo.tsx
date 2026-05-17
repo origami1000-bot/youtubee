@@ -4,8 +4,23 @@ import configData from '../video-config.json';
 import telopStyleData from '../telop-style.json';
 import manifestData from '../assets-manifest.json';
 
-type AssetManifest = { audio?: string[]; images?: string[] };
+type AssetManifest = {
+  audio?:  Record<string, string> | string[];
+  images?: Record<string, string> | string[];
+};
 const manifest = manifestData as AssetManifest;
+
+/** シーン番号（1始まり）でマニフェストからパスを取得。オブジェクト形式・配列形式どちらにも対応 */
+function resolveManifestPath(
+  field: Record<string, string> | string[] | undefined,
+  sceneNumber: number
+): string {
+  if (!field) return "";
+  if (Array.isArray(field)) {
+    return field[sceneNumber - 1] ?? "";
+  }
+  return (field as Record<string, string>)[String(sceneNumber)] ?? "";
+}
 
 interface TelopStyle {
   fontSize: number;
@@ -21,6 +36,8 @@ interface TelopStyle {
 const style: TelopStyle = telopStyleData as TelopStyle;
 
 interface SceneConfig {
+  /** video-config.json の scene フィールド（同じシーン番号 = 同じ背景画像） */
+  scene?: number;
   text: string;
   durationInSeconds: number;
   effect?: 'zoom-in' | 'zoom-out' | 'pan-right' | 'pan-left' | string;
@@ -153,18 +170,16 @@ const SceneItem: React.FC<{
     transform = `translateX(${interpolate(progress, [0, 1], [-5, 0])}%) scale(1.1)`;
   }
 
-  // manifest があればそちらを優先、なければ images/scene-N.png
-  const imgRel =
-    manifest.images?.[index] && manifest.images[index].length > 0
-      ? manifest.images[index]
-      : data.imageFile && data.imageFile.length > 0
-      ? data.imageFile
-      : `images/scene-${index + 1}.png`;
+  // 画像: video-config の scene フィールド（シーン番号）で引く
+  //   同じシーン番号を持つ複数エントリは同じ背景画像を共有する
+  const imageSceneNum = typeof data.scene === 'number' ? data.scene : index + 1;
+  const imgFromManifest = resolveManifestPath(manifest.images, imageSceneNum);
+  const imgRel = imgFromManifest || (data.imageFile ?? "") || `images/scene-${imageSceneNum}.png`;
 
-  const audRel =
-    manifest.audio?.[index] && manifest.audio[index].length > 0
-      ? manifest.audio[index]
-      : `drop/audio/scene${index + 1}.mp3`;
+  // 音声: エントリーの配列位置（1始まり）で引く
+  const audioEntryNum = index + 1;
+  const audFromManifest = resolveManifestPath(manifest.audio, audioEntryNum);
+  const audRel = audFromManifest || `drop/audio/scene${audioEntryNum}.mp3`;
 
   const imgSrc = staticFile(imgRel);
   const resolvedAudioSrc = audioSrc || staticFile(audRel);
