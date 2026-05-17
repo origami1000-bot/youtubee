@@ -51,14 +51,48 @@
 
         <!-- プロバイダー切替 -->
         <div class="provider-tabs">
-          <button type="button" class="provider-tab active" data-provider="openai">OpenAI TTS</button>
+          <button type="button" class="provider-tab active" data-provider="elevenlabs">ElevenLabs v3</button>
+          <button type="button" class="provider-tab" data-provider="openai">OpenAI TTS</button>
           <button type="button" class="provider-tab" data-provider="aivis">Aivis Cloud</button>
           <button type="button" class="provider-tab" data-provider="gemini">Google Gemini TTS</button>
           <button type="button" class="provider-tab" data-provider="xai">Grok（xAI）TTS</button>
         </div>
 
+        <!-- ElevenLabs v3（オーディオタグ） -->
+        <div id="elevenlabsForm" class="el-grid" style="margin-top:14px">
+          <div class="el-field" style="grid-column: 1 / -1">
+            <label>ElevenLabs API キー <span style="font-size:0.8em;color:#64748b">（<a href="https://elevenlabs.io/app/settings/api-keys" target="_blank" rel="noopener">API Keys</a>）</span></label>
+            <input type="password" id="elevenlabsApiKey" placeholder="xi-..." autocomplete="off" />
+          </div>
+          <div class="el-field">
+            <label>Voice ID（話者 A）</label>
+            <input type="text" id="elevenlabsVoiceId" placeholder="例: JBFqnCBsd6RMkjVDRZzb" />
+          </div>
+          <div class="el-field">
+            <label>Voice ID（話者 B）</label>
+            <input type="text" id="elevenlabsVoiceIdB" placeholder="2人会話用" />
+          </div>
+          <div class="el-field">
+            <label>モデル</label>
+            <select id="elevenlabsModel">
+              <option value="eleven_v3">eleven_v3（感情・オーディオタグ ★推奨）</option>
+              <option value="eleven_multilingual_v2">eleven_multilingual_v2</option>
+              <option value="eleven_turbo_v2_5">eleven_turbo_v2_5（低遅延）</option>
+            </select>
+          </div>
+          <div class="el-field">
+            <label>言語（ISO 639-1）</label>
+            <input type="text" id="elevenlabsLanguage" value="en" placeholder="en" />
+          </div>
+          <p class="hint" style="grid-column:1/-1;margin:0">
+            <strong>英語</strong>の2人会話: <code>speech_text</code> に <code>A: [excited] Hello!</code> / <code>B: [curious] Really?</code> のように行を分けるか、
+            <code>dialogue</code> 配列を使います。シーンごとに話者だけ変える場合は <code>"speaker": "a"</code> または <code>"b"</code>。
+            <a href="https://elevenlabs.io/docs/api-reference/text-to-dialogue/convert" target="_blank" rel="noopener">Dialogue API</a>
+          </p>
+        </div>
+
         <!-- OpenAI フォーム -->
-        <div id="openaiForm" class="el-grid" style="margin-top:14px">
+        <div id="openaiForm" class="el-grid" style="margin-top:14px; display:none">
           <div class="el-field">
             <label>OpenAI API キー</label>
             <input type="password" id="openaiApiKey" placeholder="sk-..." autocomplete="off" />

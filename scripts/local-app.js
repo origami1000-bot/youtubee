@@ -326,6 +326,276 @@ function xaiTtsRequest(apiKey, text, voiceId, language) {
   });
 }
 
+// ---- ElevenLabs TTS（v3 オーディオタグ対応） ----
+function elevenlabsTtsRequest(apiKey, text, voiceId, model, languageCodeOverride) {
+  const voice = (voiceId || "").trim();
+  if (!voice) {
+    return Promise.reject(new Error("ElevenLabs の voice_id が未設定です（.env の ELEVENLABS_VOICE_ID または UI）"));
+  }
+  const modelId = model || process.env.ELEVENLABS_MODEL || "eleven_v3";
+  const outputFormat = process.env.ELEVENLABS_OUTPUT_FORMAT || "mp3_44100_128";
+  const languageCode =
+    (languageCodeOverride || "").trim() || process.env.ELEVENLABS_LANGUAGE || "en";
+  const parsedTimeout = parseInt(process.env.ELEVENLABS_TTS_TIMEOUT_MS || "", 10);
+  const timeoutMs =
+    Number.isFinite(parsedTimeout) && parsedTimeout >= 30000 ? parsedTimeout : 180000;
+
+  const payload = { text, model_id: modelId };
+  if (languageCode) payload.language_code = languageCode;
+
+  const stability = parseFloat(process.env.ELEVENLABS_STABILITY || "");
+  const similarity = parseFloat(process.env.ELEVENLABS_SIMILARITY || "");
+  const style = parseFloat(process.env.ELEVENLABS_STYLE || "");
+  const speed = parseFloat(process.env.ELEVENLABS_API_SPEED || "");
+  if (
+    Number.isFinite(stability) ||
+    Number.isFinite(similarity) ||
+    Number.isFinite(style) ||
+    Number.isFinite(speed)
+  ) {
+    payload.voice_settings = {};
+    if (Number.isFinite(stability)) payload.voice_settings.stability = stability;
+    if (Number.isFinite(similarity)) payload.voice_settings.similarity_boost = similarity;
+    if (Number.isFinite(style)) payload.voice_settings.style = style;
+    if (Number.isFinite(speed)) payload.voice_settings.speed = speed;
+  }
+
+  const body = JSON.stringify(payload);
+  const pathStr = `/v1/text-to-speech/${encodeURIComponent(voice)}?output_format=${encodeURIComponent(outputFormat)}`;
+
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    let req;
+    const fail = (err) => {
+      if (settled) return;
+      settled = true;
+      try {
+        req.destroy();
+      } catch (_) {
+        /* ignore */
+      }
+      reject(err);
+    };
+    const succeed = (buf) => {
+      if (settled) return;
+      settled = true;
+      try {
+        req.destroy();
+      } catch (_) {
+        /* ignore */
+      }
+      resolve(buf);
+    };
+
+    const options = {
+      hostname: "api.elevenlabs.io",
+      path: pathStr,
+      method: "POST",
+      headers: {
+        "xi-api-key": apiKey,
+        "Content-Type": "application/json",
+        "Content-Length": Buffer.byteLength(body),
+        Accept: "audio/mpeg",
+      },
+    };
+
+    req = https.request(options, (res) => {
+      const chunks = [];
+      res.on("data", (d) => chunks.push(d));
+      res.on("end", () => {
+        const buf = Buffer.concat(chunks);
+        if (res.statusCode !== 200) {
+          let msg = buf.toString("utf8").slice(0, 800);
+          try {
+            const j = JSON.parse(msg);
+            msg = j.detail?.message || j.detail || j.message || JSON.stringify(j);
+          } catch {
+            /* raw */
+          }
+          fail(new Error(`ElevenLabs TTS error ${res.statusCode}: ${msg}`));
+          return;
+        }
+        succeed(buf);
+      });
+    });
+
+    req.on("error", fail);
+    req.setTimeout(timeoutMs, () =>
+      fail(
+        new Error(
+          `ElevenLabs TTS: ${timeoutMs}ms でタイムアウト。v3 は長文で時間がかかることがあります。ELEVENLABS_TTS_TIMEOUT_MS で延長できます。`
+        )
+      )
+    );
+    req.write(body);
+    req.end();
+  });
+}
+
+/** ElevenLabs Text-to-Dialogue（2人以上の会話を1本の音声に） */
+function elevenlabsDialogueRequest(apiKey, inputs, model, languageCodeOverride) {
+  if (!Array.isArray(inputs) || inputs.length === 0) {
+    return Promise.reject(new Error("dialogue inputs が空です"));
+  }
+  const modelId = model || process.env.ELEVENLABS_MODEL || "eleven_v3";
+  const outputFormat = process.env.ELEVENLABS_OUTPUT_FORMAT || "mp3_44100_128";
+  const languageCode =
+    (languageCodeOverride || "").trim() || process.env.ELEVENLABS_LANGUAGE || "en";
+  const parsedTimeout = parseInt(process.env.ELEVENLABS_TTS_TIMEOUT_MS || "", 10);
+  const timeoutMs =
+    Number.isFinite(parsedTimeout) && parsedTimeout >= 30000 ? parsedTimeout : 240000;
+
+  const payload = { inputs, model_id: modelId };
+  if (languageCode) payload.language_code = languageCode;
+
+  const stability = parseFloat(process.env.ELEVENLABS_STABILITY || "");
+  if (Number.isFinite(stability)) {
+    payload.settings = { stability };
+  }
+
+  const body = JSON.stringify(payload);
+  const pathStr = `/v1/text-to-dialogue?output_format=${encodeURIComponent(outputFormat)}`;
+
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    let req;
+    const fail = (err) => {
+      if (settled) return;
+      settled = true;
+      try {
+        req.destroy();
+      } catch (_) {
+        /* ignore */
+      }
+      reject(err);
+    };
+    const succeed = (buf) => {
+      if (settled) return;
+      settled = true;
+      try {
+        req.destroy();
+      } catch (_) {
+        /* ignore */
+      }
+      resolve(buf);
+    };
+
+    req = https.request(
+      {
+        hostname: "api.elevenlabs.io",
+        path: pathStr,
+        method: "POST",
+        headers: {
+          "xi-api-key": apiKey,
+          "Content-Type": "application/json",
+          "Content-Length": Buffer.byteLength(body),
+          Accept: "audio/mpeg",
+        },
+      },
+      (res) => {
+        const chunks = [];
+        res.on("data", (d) => chunks.push(d));
+        res.on("end", () => {
+          const buf = Buffer.concat(chunks);
+          if (res.statusCode !== 200) {
+            let msg = buf.toString("utf8").slice(0, 800);
+            try {
+              const j = JSON.parse(msg);
+              msg = j.detail?.message || j.detail || j.message || JSON.stringify(j);
+            } catch {
+              /* raw */
+            }
+            fail(new Error(`ElevenLabs Dialogue error ${res.statusCode}: ${msg}`));
+            return;
+          }
+          succeed(buf);
+        });
+      }
+    );
+
+    req.on("error", fail);
+    req.setTimeout(timeoutMs, () =>
+      fail(new Error(`ElevenLabs Dialogue: ${timeoutMs}ms でタイムアウト`))
+    );
+    req.write(body);
+    req.end();
+  });
+}
+
+function normalizeDialogueSpeaker(raw) {
+  const s = String(raw == null ? "a" : raw).trim().toLowerCase();
+  if (s === "b" || s === "2" || s === "speaker2" || s === "host2" || s === "guest") return "b";
+  return "a";
+}
+
+function speakerToElevenVoiceId(speaker, voiceA, voiceB) {
+  return normalizeDialogueSpeaker(speaker) === "b" ? voiceB : voiceA;
+}
+
+/** A: Hello\nB: Hi 形式をパース */
+function parseDialogueLines(text) {
+  if (!text || typeof text !== "string") return [];
+  const out = [];
+  for (const line of text.split(/\r?\n/)) {
+    const m = line.match(
+      /^\s*(A|B|Speaker\s*1|Speaker\s*2|Host\s*1|Host\s*2)\s*[:：]\s*(.+)$/i
+    );
+    if (!m) continue;
+    const tag = m[1].toLowerCase().replace(/\s/g, "");
+    const speaker =
+      tag === "b" || tag === "speaker2" || tag === "host2" ? "b" : "a";
+    const t = m[2].trim();
+    if (t) out.push({ speaker, text: t });
+  }
+  return out;
+}
+
+/** シーンから ElevenLabs 用の単独 TTS / 2人会話を判定 */
+function resolveElevenlabsScene(scene, voiceA, voiceB) {
+  const vA = (voiceA || "").trim();
+  const vB = (voiceB || "").trim();
+
+  const fromArray = (arr) => {
+    const inputs = [];
+    for (const line of arr) {
+      if (!line || typeof line !== "object") continue;
+      const text = applyDictionary(String(line.text || "").trim());
+      if (!text) continue;
+      const voice_id = (line.voice_id || "").trim() ||
+        speakerToElevenVoiceId(line.speaker, vA, vB);
+      if (!voice_id) continue;
+      inputs.push({ text, voice_id });
+    }
+    return inputs;
+  };
+
+  if (Array.isArray(scene.dialogue) && scene.dialogue.length > 0) {
+    const inputs = fromArray(scene.dialogue);
+    if (inputs.length >= 2) return { mode: "dialogue", inputs };
+    if (inputs.length === 1) {
+      return { mode: "tts", text: inputs[0].text, voiceId: inputs[0].voice_id };
+    }
+  }
+
+  const manualTts = (scene.ttsText || "").trim();
+  const autoBase = defaultTtsBaseFromScene(scene);
+  const raw = manualTts || autoBase;
+  if (!raw) return { mode: "empty" };
+
+  const parsed = parseDialogueLines(applyDictionary(raw));
+  if (parsed.length >= 2) {
+    const inputs = parsed.map((p) => ({
+      text: p.text,
+      voice_id: speakerToElevenVoiceId(p.speaker, vA, vB),
+    }));
+    return { mode: "dialogue", inputs };
+  }
+
+  const text = manualTts ? applyDictionary(manualTts) : applyDictionary(autoBase);
+  const voiceId = speakerToElevenVoiceId(scene.speaker, vA, vB) || vA;
+  return { mode: "tts", text, voiceId };
+}
+
 // ---- OpenAI TTS ----
 function openaiTtsRequest(apiKey, text, voice, model) {
   return new Promise((resolve, reject) => {
@@ -541,7 +811,7 @@ app.get("/health", (_req, res) => {
     appDir,
     indexExists: fs.existsSync(path.join(appDir, "index.html")),
     /** クライアントが新しいサーバーか判別する用 */
-    features: { resetProject: true, xaiTts: true },
+    features: { resetProject: true, xaiTts: true, elevenlabsTts: true },
   });
 });
 
@@ -612,19 +882,48 @@ app.get("/api/tts/settings", (_req, res) => {
     xaiVoice: process.env.XAI_TTS_VOICE || "eve",
     xaiLanguage: process.env.XAI_TTS_LANGUAGE || "ja",
     ttsSpeed: parseFloat(process.env.TTS_SPEED || "1.0"),
+    elevenlabsApiKey: process.env.ELEVENLABS_API_KEY || "",
+    elevenlabsVoiceId: process.env.ELEVENLABS_VOICE_ID || "",
+    elevenlabsModel: process.env.ELEVENLABS_MODEL || "eleven_v3",
+    elevenlabsVoiceIdB: process.env.ELEVENLABS_VOICE_ID_B || "",
+    elevenlabsLanguage: process.env.ELEVENLABS_LANGUAGE || "en",
   });
 });
 
-/** クライアントや .env 表記ゆれを吸収（未再起動の切り分けは /health の features.xaiTts を見る） */
+/** クライアントや .env 表記ゆれを吸収（未再起動の切り分けは /health の features を見る） */
 function normalizeTtsProvider(p) {
   const s = String(p == null ? "" : p).trim().toLowerCase();
   if (s === "grok" || s === "xai_tts") return "xai";
-  if (s === "gemini" || s === "openai" || s === "aivis" || s === "xai") return s;
+  if (s === "eleven" || s === "11labs") return "elevenlabs";
+  if (s === "gemini" || s === "openai" || s === "aivis" || s === "xai" || s === "elevenlabs") return s;
   return s || "openai";
 }
 
+/** Eleven v3 は [sigh] 等のオーディオタグを維持するため kuromoji 変換を行わない */
+async function resolveSceneTtsText(scene, provider) {
+  const manualTts = (scene.ttsText || "").trim();
+  const autoBase = defaultTtsBaseFromScene(scene);
+  if (!manualTts && !autoBase) return "";
+  const base = manualTts || autoBase;
+  const withDict = applyDictionary(base);
+  if (normalizeTtsProvider(provider) === "elevenlabs") {
+    return withDict;
+  }
+  if (manualTts) return withDict;
+  return convertToReading(withDict);
+}
+
 // ---- TTS 共通ヘルパー（プロバイダー振り分け） ----
-async function generateAudioBuffer(provider, apiKey, voiceParam, ttsText, instruction, model, ttsLanguage = "") {
+async function generateAudioBuffer(
+  provider,
+  apiKey,
+  voiceParam,
+  ttsText,
+  instruction,
+  model,
+  ttsLanguage = "",
+  elevenlabsExtra = null
+) {
   const prov = normalizeTtsProvider(provider);
   if (prov === "gemini") {
     return withRetry(() => geminiTtsRequest(apiKey, ttsText, voiceParam, instruction, model));
@@ -638,6 +937,15 @@ async function generateAudioBuffer(provider, apiKey, voiceParam, ttsText, instru
   if (prov === "xai") {
     return withRetry(() => xaiTtsRequest(apiKey, ttsText, voiceParam, ttsLanguage));
   }
+  if (prov === "elevenlabs") {
+    if (elevenlabsExtra && elevenlabsExtra.mode === "dialogue") {
+      return withRetry(() =>
+        elevenlabsDialogueRequest(apiKey, elevenlabsExtra.inputs, model, ttsLanguage)
+      );
+    }
+    const voice = (elevenlabsExtra && elevenlabsExtra.voiceId) || voiceParam;
+    return withRetry(() => elevenlabsTtsRequest(apiKey, ttsText, voice, model, ttsLanguage));
+  }
   throw new Error(`未対応の TTS プロバイダー: ${provider}`);
 }
 
@@ -645,32 +953,40 @@ function audioExt(provider) {
   return provider === "gemini" ? "wav" : "mp3";
 }
 
-// ---- TTS 音声一括生成（OpenAI / Gemini / Aivis Cloud / xAI Grok） ----
+// ---- TTS 音声一括生成（OpenAI / Gemini / Aivis / xAI / ElevenLabs v3） ----
 app.post("/api/tts/generate", async (req, res) => {
   const provider = normalizeTtsProvider(req.body && req.body.provider);
   const isGemini = provider === "gemini";
   const isOpenai = provider === "openai";
   const isAivis = provider === "aivis";
   const isXai = provider === "xai";
+  const isElevenlabs = provider === "elevenlabs";
 
   const apiKey = (req.body && req.body.apiKey) ||
     (isGemini ? process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_STUDIO_API_KEY
      : isOpenai ? process.env.OPENAI_API_KEY
      : isAivis ? process.env.AIVIS_API_KEY
      : isXai ? process.env.XAI_API_KEY || process.env.GROK_API_KEY
+     : isElevenlabs ? process.env.ELEVENLABS_API_KEY
      : "") || "";
   const voiceParam = (req.body && req.body.voiceId) ||
     (isGemini ? process.env.GEMINI_TTS_VOICE || "Kore"
      : isOpenai ? process.env.OPENAI_TTS_VOICE || "nova"
      : isAivis ? process.env.AIVIS_MODEL_UUID || ""
      : isXai ? process.env.XAI_TTS_VOICE || "eve"
+     : isElevenlabs ? process.env.ELEVENLABS_VOICE_ID || ""
      : "") || "";
+  const voiceParamB = (req.body && req.body.voiceIdB) ||
+    (isElevenlabs ? process.env.ELEVENLABS_VOICE_ID_B || "" : "") || "";
   const instruction = (req.body && req.body.instruction) || process.env.GEMINI_TTS_INSTRUCTION || "";
   const model = (req.body && req.body.model) ||
     (isGemini ? process.env.GEMINI_TTS_MODEL || "gemini-2.5-flash-preview-tts"
+     : isElevenlabs ? process.env.ELEVENLABS_MODEL || "eleven_v3"
      : process.env.OPENAI_TTS_MODEL || "tts-1");
   const ttsLanguage = (req.body && req.body.ttsLanguage) ||
-    (isXai ? process.env.XAI_TTS_LANGUAGE || "ja" : "");
+    (isXai ? process.env.XAI_TTS_LANGUAGE || "ja"
+     : isElevenlabs ? process.env.ELEVENLABS_LANGUAGE || "en"
+     : "");
   const speedRaw = (req.body && req.body.speed != null)
     ? parseFloat(req.body.speed)
     : parseFloat(process.env.TTS_SPEED || "1.0");
@@ -678,6 +994,9 @@ app.post("/api/tts/generate", async (req, res) => {
 
   if (!apiKey) {
     return res.status(400).json({ ok: false, error: "API キーが設定されていません。" });
+  }
+  if (isElevenlabs && !voiceParam) {
+    return res.status(400).json({ ok: false, error: "ElevenLabs の Voice ID（話者A）が未設定です。" });
   }
 
   let config = [];
@@ -697,10 +1016,36 @@ app.post("/api/tts/generate", async (req, res) => {
   const results = [];
   for (let i = 0; i < config.length; i++) {
     const scene = config[i];
-    const manualTts = (scene.ttsText || "").trim();
-    const autoBase = defaultTtsBaseFromScene(scene);
-    if (!manualTts && !autoBase) { results.push({ scene: i + 1, skipped: true }); continue; }
-    const ttsText = manualTts ? manualTts : await convertToReading(applyDictionary(autoBase));
+    let ttsText = "";
+    let elevenExtra = null;
+    if (isElevenlabs) {
+      const resolved = resolveElevenlabsScene(scene, voiceParam, voiceParamB);
+      if (resolved.mode === "empty") {
+        results.push({ scene: i + 1, skipped: true });
+        continue;
+      }
+      if (resolved.mode === "dialogue") {
+        if (!voiceParamB) {
+          results.push({
+            scene: i + 1,
+            ok: false,
+            error: "2人会話には Voice ID（話者B）が必要です",
+          });
+          continue;
+        }
+        elevenExtra = { mode: "dialogue", inputs: resolved.inputs };
+        ttsText = resolved.inputs.map((x) => x.text).join(" ");
+      } else {
+        ttsText = resolved.text;
+        elevenExtra = { mode: "tts", voiceId: resolved.voiceId };
+      }
+    } else {
+      ttsText = await resolveSceneTtsText(scene, provider);
+      if (!ttsText) {
+        results.push({ scene: i + 1, skipped: true });
+        continue;
+      }
+    }
 
     const filename = `${String(i + 1).padStart(2, "0")}_scene${i + 1}.${ext}`;
     const outPath = path.join(audioDir, filename);
@@ -714,15 +1059,25 @@ app.post("/api/tts/generate", async (req, res) => {
     } catch {}
 
     try {
-      const rawBuf = await generateAudioBuffer(provider, apiKey, voiceParam, ttsText, instruction, model, ttsLanguage);
+      const rawBuf = await generateAudioBuffer(
+        provider,
+        apiKey,
+        voiceParam,
+        ttsText,
+        instruction,
+        model,
+        ttsLanguage,
+        elevenExtra
+      );
       const buf = applyPlaybackSpeedWithFfmpeg(rawBuf, ext, speed);
       fs.writeFileSync(outPath, buf);
-      results.push({ scene: i + 1, file: filename, ok: true });
+      const tag = elevenExtra && elevenExtra.mode === "dialogue" ? "（2人会話）" : "";
+      results.push({ scene: i + 1, file: filename, ok: true, tag });
     } catch (e) {
       results.push({ scene: i + 1, error: e.message, ok: false });
     }
 
-    const delayMs = isGemini ? 7000 : isXai ? 1200 : 800;
+    const delayMs = isGemini ? 7000 : isElevenlabs ? 2500 : isXai ? 1200 : 800;
     await new Promise((r) => setTimeout(r, delayMs));
   }
 
@@ -731,6 +1086,11 @@ app.post("/api/tts/generate", async (req, res) => {
   const failed = results.filter((r) => !r.skipped && !r.ok);
   const okCount = results.filter((r) => r.ok).length;
   const noteParts = [`生成 ${okCount}/${config.length} シーン`];
+  if (isElevenlabs) {
+    noteParts.push(
+      "Eleven v3（英語）: 2人会話は dialogue 配列、または speech_text に A:/B: 行。話者切替は speaker: \"a\"|\"b\""
+    );
+  }
   if (Math.abs(speed - 1) >= 0.02) {
     if (ffmpegOnPath()) {
       noteParts.push(`話速 ${speed.toFixed(2)}x（FFmpeg atempo で反映）`);
@@ -763,39 +1123,73 @@ app.post("/api/tts/generate-scene", async (req, res) => {
   const isOpenai = provider === "openai";
   const isAivis = provider === "aivis";
   const isXai = provider === "xai";
+  const isElevenlabs = provider === "elevenlabs";
 
   const apiKey = (req.body && req.body.apiKey) ||
     (isGemini ? process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_STUDIO_API_KEY
      : isOpenai ? process.env.OPENAI_API_KEY
      : isAivis ? process.env.AIVIS_API_KEY
      : isXai ? process.env.XAI_API_KEY || process.env.GROK_API_KEY
+     : isElevenlabs ? process.env.ELEVENLABS_API_KEY
      : "") || "";
   const voiceParam = (req.body && req.body.voiceId) ||
     (isGemini ? process.env.GEMINI_TTS_VOICE || "Kore"
      : isOpenai ? process.env.OPENAI_TTS_VOICE || "nova"
      : isAivis ? process.env.AIVIS_MODEL_UUID || ""
      : isXai ? process.env.XAI_TTS_VOICE || "eve"
+     : isElevenlabs ? process.env.ELEVENLABS_VOICE_ID || ""
      : "") || "";
+  const voiceParamB = (req.body && req.body.voiceIdB) ||
+    (isElevenlabs ? process.env.ELEVENLABS_VOICE_ID_B || "" : "") || "";
   const instruction = (req.body && req.body.instruction) || process.env.GEMINI_TTS_INSTRUCTION || "";
   const model = (req.body && req.body.model) ||
     (isGemini ? process.env.GEMINI_TTS_MODEL || "gemini-2.5-flash-preview-tts"
+     : isElevenlabs ? process.env.ELEVENLABS_MODEL || "eleven_v3"
      : process.env.OPENAI_TTS_MODEL || "tts-1");
   const ttsLanguage = (req.body && req.body.ttsLanguage) ||
-    (isXai ? process.env.XAI_TTS_LANGUAGE || "ja" : "");
+    (isXai ? process.env.XAI_TTS_LANGUAGE || "ja"
+     : isElevenlabs ? process.env.ELEVENLABS_LANGUAGE || "en"
+     : "");
   const speedRaw = (req.body && req.body.speed != null)
     ? parseFloat(req.body.speed)
     : parseFloat(process.env.TTS_SPEED || "1.0");
   const speed = Number.isFinite(speedRaw) ? speedRaw : 1;
 
   if (!apiKey) return res.status(400).json({ ok: false, error: "API キーが未設定" });
+  if (isElevenlabs && !voiceParam) {
+    return res.status(400).json({ ok: false, error: "ElevenLabs の Voice ID（話者A）が未設定です。" });
+  }
 
   const scene = config[sceneIndex];
-  const manualTts = (scene.ttsText || "").trim();
-  const autoBase = defaultTtsBaseFromScene(scene);
-  if (!manualTts && !autoBase) {
-    return res.status(400).json({ ok: false, error: "読み上げ元が空です。speech_text または text、または ttsText を設定してください。" });
+  let ttsText = "";
+  let elevenExtra = null;
+  if (isElevenlabs) {
+    const resolved = resolveElevenlabsScene(scene, voiceParam, voiceParamB);
+    if (resolved.mode === "empty") {
+      return res.status(400).json({
+        ok: false,
+        error: "読み上げ元が空です。speech_text / dialogue / ttsText を設定してください。",
+      });
+    }
+    if (resolved.mode === "dialogue") {
+      if (!voiceParamB) {
+        return res.status(400).json({ ok: false, error: "2人会話には Voice ID（話者B）が必要です。" });
+      }
+      elevenExtra = { mode: "dialogue", inputs: resolved.inputs };
+      ttsText = resolved.inputs.map((x) => x.text).join(" ");
+    } else {
+      ttsText = resolved.text;
+      elevenExtra = { mode: "tts", voiceId: resolved.voiceId };
+    }
+  } else {
+    ttsText = await resolveSceneTtsText(scene, provider);
+    if (!ttsText) {
+      return res.status(400).json({
+        ok: false,
+        error: "読み上げ元が空です。speech_text または text、または ttsText を設定してください。",
+      });
+    }
   }
-  const ttsText = manualTts ? manualTts : await convertToReading(applyDictionary(autoBase));
 
   const audioDir = path.join(root, "public", "drop", "audio");
   fs.mkdirSync(audioDir, { recursive: true });
@@ -811,13 +1205,23 @@ app.post("/api/tts/generate-scene", async (req, res) => {
   } catch {}
 
   try {
-    const rawBuf = await generateAudioBuffer(provider, apiKey, voiceParam, ttsText, instruction, model, ttsLanguage);
+    const rawBuf = await generateAudioBuffer(
+      provider,
+      apiKey,
+      voiceParam,
+      ttsText,
+      instruction,
+      model,
+      ttsLanguage,
+      elevenExtra
+    );
     const buf = applyPlaybackSpeedWithFfmpeg(rawBuf, ext, speed);
     fs.writeFileSync(outPath, buf);
     syncManifestInline();
     let note = "";
+    if (elevenExtra && elevenExtra.mode === "dialogue") note = "（2人会話）";
     if (Math.abs(speed - 1) >= 0.02 && !ffmpegOnPath()) {
-      note = "（ffmpeg なしのため話速スライダーは未適用）";
+      note += (note ? " " : "") + "（ffmpeg なしのため話速スライダーは未適用）";
     }
     res.json({ ok: true, file: filename, scene: sceneIndex + 1, note });
   } catch (e) {
@@ -1059,7 +1463,7 @@ app.use((err, _req, res, _next) => {
 const PORT = Number(process.env.PORT) || 3847;
 const server = app.listen(PORT, "127.0.0.1", () => {
   console.log(`\n  ローカル操作パネル: http://127.0.0.1:${PORT}/`);
-  console.log(`  TTS: openai / aivis / gemini / xai（Grok）… タブで選べます。xai で「未対応」と出る場合はこのプロセスを止めて npm run app を再起動してください。`);
+  console.log(`  TTS: openai / aivis / gemini / xai / elevenlabs（v3）… タブで選べます。未対応と出る場合は npm run app を再起動してください。`);
   console.log(`  前作全消去 API: POST /api/reset-new-video または /api/project/reset-for-new-video`);
   console.log(`  CLI: npm run reset-project はい\n`);
 });

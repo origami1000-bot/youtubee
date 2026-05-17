@@ -88,7 +88,7 @@ document.getElementById("openImagesFolder").addEventListener("click", async () =
 });
 
 // ---- ③ 音声生成 ----
-let currentProvider = "openai";
+let currentProvider = "elevenlabs";
 
 // プロバイダータブの切替
 document.querySelectorAll(".provider-tab").forEach(btn => {
@@ -96,6 +96,7 @@ document.querySelectorAll(".provider-tab").forEach(btn => {
     currentProvider = btn.dataset.provider;
     document.querySelectorAll(".provider-tab").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
+    document.getElementById("elevenlabsForm").style.display = currentProvider === "elevenlabs" ? "" : "none";
     document.getElementById("openaiForm").style.display = currentProvider === "openai"  ? "" : "none";
     document.getElementById("aivisForm").style.display  = currentProvider === "aivis"   ? "" : "none";
     document.getElementById("geminiForm").style.display = currentProvider === "gemini"  ? "" : "none";
@@ -123,6 +124,22 @@ async function loadTtsSettings() {
       if (d.xaiApiKey)       document.getElementById("xaiApiKey").value       = d.xaiApiKey;
       if (d.xaiVoice)        document.getElementById("xaiVoice").value        = d.xaiVoice;
       if (d.xaiLanguage)     document.getElementById("xaiLanguage").value     = d.xaiLanguage;
+      if (d.elevenlabsApiKey) document.getElementById("elevenlabsApiKey").value = d.elevenlabsApiKey;
+      if (d.elevenlabsVoiceId) document.getElementById("elevenlabsVoiceId").value = d.elevenlabsVoiceId;
+      if (d.elevenlabsVoiceIdB) document.getElementById("elevenlabsVoiceIdB").value = d.elevenlabsVoiceIdB;
+      if (d.elevenlabsModel) document.getElementById("elevenlabsModel").value = d.elevenlabsModel;
+      if (d.elevenlabsLanguage) document.getElementById("elevenlabsLanguage").value = d.elevenlabsLanguage;
+      if (d.elevenlabsApiKey) {
+        currentProvider = "elevenlabs";
+        document.querySelectorAll(".provider-tab").forEach((b) => {
+          b.classList.toggle("active", b.dataset.provider === "elevenlabs");
+        });
+        document.getElementById("elevenlabsForm").style.display = "";
+        document.getElementById("openaiForm").style.display = "none";
+        document.getElementById("aivisForm").style.display = "none";
+        document.getElementById("geminiForm").style.display = "none";
+        document.getElementById("xaiForm").style.display = "none";
+      }
     }
   } catch {}
 }
@@ -132,9 +149,12 @@ function getTtsParams() {
   const isOpenai = currentProvider === "openai";
   const isAivis  = currentProvider === "aivis";
   const isXai    = currentProvider === "xai";
+  const isElevenlabs = currentProvider === "elevenlabs";
   return {
     provider: currentProvider,
-    apiKey: isGemini
+    apiKey: isElevenlabs
+      ? document.getElementById("elevenlabsApiKey").value.trim()
+      : isGemini
       ? document.getElementById("geminiApiKey").value.trim()
       : isOpenai
       ? document.getElementById("openaiApiKey").value.trim()
@@ -143,7 +163,9 @@ function getTtsParams() {
       : isXai
       ? document.getElementById("xaiApiKey").value.trim()
       : "",
-    voiceId: isGemini
+    voiceId: isElevenlabs
+      ? document.getElementById("elevenlabsVoiceId").value.trim()
+      : isGemini
       ? document.getElementById("geminiVoice").value
       : isOpenai
       ? document.getElementById("openaiVoice").value
@@ -152,15 +174,24 @@ function getTtsParams() {
       : isXai
       ? document.getElementById("xaiVoice").value
       : "",
+    voiceIdB: isElevenlabs
+      ? document.getElementById("elevenlabsVoiceIdB").value.trim()
+      : "",
     instruction: isGemini
       ? document.getElementById("geminiInstruction").value.trim()
       : "",
-    model: isGemini
+    model: isElevenlabs
+      ? document.getElementById("elevenlabsModel").value
+      : isGemini
       ? document.getElementById("geminiModel").value
       : isOpenai
       ? document.getElementById("openaiModel").value
       : "",
-    ttsLanguage: isXai ? document.getElementById("xaiLanguage").value : "",
+    ttsLanguage: isElevenlabs
+      ? document.getElementById("elevenlabsLanguage").value.trim()
+      : isXai
+      ? document.getElementById("xaiLanguage").value
+      : "",
     speed: parseFloat(document.getElementById("ttsSpeed")?.value || "1.0"),
   };
 }
@@ -193,7 +224,7 @@ document.getElementById("generateAudio").addEventListener("click", async () => {
     log.style.display = "block";
     log.textContent = (d.results || []).map((r) =>
       r.skipped ? `scene${r.scene}: スキップ` :
-      r.ok ? `scene${r.scene}: ✓ ${r.file}` :
+      r.ok ? `scene${r.scene}: ✓ ${r.file}${r.tag ? " " + r.tag : ""}` :
       `scene${r.scene}: ✗ ${r.error}`
     ).join("\n");
   } catch (e) {
@@ -214,10 +245,20 @@ function buildTtsPanel(scenes) {
       .replace(/"/g, "&quot;")
       .replace(/</g, "&lt;");
     const tts = (s.ttsText || "").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+    const sp = String(s.speaker || "a").trim().toLowerCase();
+    const selA = (sp === "a" || sp === "1" || sp === "speaker1" || sp === "host1") ? "selected" : "";
+    const selB = (sp === "b" || sp === "2" || sp === "speaker2" || sp === "host2" || sp === "guest") ? "selected" : "";
     return `
       <tr>
         <td class="tts-num">${i + 1}</td>
         <td class="tts-telop">${(s.text || "").replace(/</g, "&lt;")}</td>
+        <td style="padding:4px 6px;vertical-align:middle;white-space:nowrap">
+          <select class="tts-speaker" data-index="${i}" title="話者（ElevenLabs 用）"
+            style="font-size:0.82em;padding:2px 4px;border:1px solid #cbd5e1;border-radius:4px;background:#f8fafc">
+            <option value="a" ${selA}>話者 A</option>
+            <option value="b" ${selB}>話者 B</option>
+          </select>
+        </td>
         <td class="tts-input-cell">
           <input type="text" class="tts-input" data-index="${i}"
             value="${tts}" placeholder="${speechPh}" />
@@ -235,6 +276,7 @@ function buildTtsPanel(scenes) {
         <tr>
           <th>#</th>
           <th>テロップ（表示）</th>
+          <th style="white-space:nowrap">話者</th>
           <th>読み上げ（空欄 = 台本 JSON の speech_text と同じ）</th>
           <th></th>
         </tr>
@@ -288,6 +330,13 @@ document.getElementById("saveTtsText").addEventListener("click", async () => {
         } else {
           delete config[i].ttsText;
         }
+      }
+    });
+
+    document.querySelectorAll(".tts-speaker").forEach((sel) => {
+      const i = Number(sel.dataset.index);
+      if (config[i]) {
+        config[i].speaker = sel.value;
       }
     });
 
@@ -735,6 +784,7 @@ document.addEventListener("keydown", (ev) => {
       const missing = [];
       if (!h.features?.resetProject) missing.push("前作全消去など");
       if (!h.features?.xaiTts) missing.push("Grok（xAI）TTS");
+      if (!h.features?.elevenlabsTts) missing.push("ElevenLabs v3");
       if (missing.length > 0) {
         const el = document.getElementById("serverStaleBanner");
         if (el) {
