@@ -27,6 +27,8 @@ const scriptData: Array<{
   durationPadSeconds?: number;
   /** シーンの最低秒数（音声尺 + パッドがこれ未満なら伸ばす） */
   minDurationSeconds?: number;
+  /** 音声末尾を切り落とす秒数（TTS のラスト単語繰り返し対策。0 で無効） */
+  audioTailTrimSec?: number;
 }> = Array.isArray(configData) ? configData as any[] : [];
 
 const FALLBACK_SEC = 10;
@@ -34,6 +36,10 @@ const FALLBACK_SEC = 10;
 const TIMEOUT_MS = 12000;
 // ブラウザが返す長さが実再生より短いことがある（VBR MP3 等）ためデフォルトで厚めに取る
 const END_BUFFER_SEC = 1.5;
+// シーン切り替え時にラスト単語が二重に聞こえる事象の安全マージン（秒）
+// デフォルトは 0（無効）。話速 0.9 等で再生していると 0.12s でも 1音節分カットされ得るため、
+// 必要なシーンに限り video-config.json の audioTailTrimSec を設定してオプトイン推奨。
+const DEFAULT_AUDIO_TAIL_TRIM_SEC = 0;
 
 function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
   return Promise.race([
@@ -81,10 +87,20 @@ export const RemotionRoot: React.FC = () => {
             durationFrames = Math.max(durationFrames, Math.ceil(scene.minDurationSeconds * fps));
           }
 
+          const tailTrimSec =
+            typeof scene.audioTailTrimSec === "number" && Number.isFinite(scene.audioTailTrimSec)
+              ? Math.max(0, scene.audioTailTrimSec)
+              : DEFAULT_AUDIO_TAIL_TRIM_SEC;
+          const audioEndFrame = Math.max(
+            1,
+            Math.floor(Math.max(0, durationSec - tailTrimSec) * fps)
+          );
+
           scenes.push({
             ...scene,
             durationFrames,
             audioSrc,
+            audioEndFrame,
           });
         }
 

@@ -7,7 +7,8 @@
     "build": "remotion render",
     "sync-assets": "node scripts/sync-assets-from-drop.js",
     "app": "node scripts/local-app.js",
-    "reset-project": "node scripts/reset-project.js"
+    "reset-project": "node scripts/reset-project.js",
+    "trim-audio-tails": "node scripts/trim-audio-tails.js"
   },
   "dependencies": {
     "@remotion/media-utils": "^4.0.440",

@@ -151,7 +151,8 @@ const SceneItem: React.FC<{
   index: number;
   durationFrames: number;
   audioSrc?: string;
-}> = ({ data, index, durationFrames, audioSrc }) => {
+  audioEndFrame?: number;
+}> = ({ data, index, durationFrames, audioSrc, audioEndFrame }) => {
   const frame = useCurrentFrame();
 
   const progress = interpolate(frame, [0, durationFrames], [0, 1], {
@@ -184,6 +185,11 @@ const SceneItem: React.FC<{
   const imgSrc = staticFile(imgRel);
   const resolvedAudioSrc = audioSrc || staticFile(audRel);
 
+  const audioProps: { src: string; endAt?: number } = { src: resolvedAudioSrc };
+  if (typeof audioEndFrame === 'number' && audioEndFrame > 0) {
+    audioProps.endAt = Math.min(audioEndFrame, durationFrames);
+  }
+
   return (
     <AbsoluteFill style={{ overflow: 'hidden', backgroundColor: 'black' }}>
       <img
@@ -196,7 +202,7 @@ const SceneItem: React.FC<{
           transformOrigin: 'center center',
         }}
       />
-      <Audio src={resolvedAudioSrc} />
+      <Audio {...audioProps} />
       <Telop text={data.text} durationFrames={durationFrames} />
     </AbsoluteFill>
   );
@@ -206,13 +212,14 @@ const SceneItem: React.FC<{
 interface SceneWithDuration extends SceneConfig {
   durationFrames: number;
   audioSrc: string;
+  audioEndFrame?: number;
 }
 
 export const MainVideo: React.FC<{ scenes?: SceneWithDuration[] }> = ({ scenes }) => {
   const { fps } = useVideoConfig();
 
   // scenes prop がある（calculateMetadata 経由）ならそちらを使う
-  const resolvedScenes: Array<SceneConfig & { durationFrames: number; audioSrc?: string }> = scenes && scenes.length > 0
+  const resolvedScenes: Array<SceneConfig & { durationFrames: number; audioSrc?: string; audioEndFrame?: number }> = scenes && scenes.length > 0
     ? scenes
     : sequences.map((s, i) => {
         const dur = typeof s.durationInSeconds === 'number' ? s.durationInSeconds : 5;
@@ -240,6 +247,7 @@ export const MainVideo: React.FC<{ scenes?: SceneWithDuration[] }> = ({ scenes }
               index={index}
               durationFrames={scene.durationFrames}
               audioSrc={scene.audioSrc}
+              audioEndFrame={scene.audioEndFrame}
             />
           </Sequence>
         );
